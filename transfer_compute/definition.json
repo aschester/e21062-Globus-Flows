@@ -1,0 +1,378 @@
+{
+    "Comment": "Mediated transfer and analysis pipeline for FRIB data",
+    "StartAt": "LookupRawTransferPath",
+    "States": {
+	"LookupRawTransferPath": {
+	    "Comment": "Look up the raw data transfer path to determine whether the directory already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_rawdata_dir.endpoint_id",
+		"path.$": "$.top_rawdata_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeRawTransferDirectory",
+		    "ResultPath": "$.RawPathErrorResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.RawPathInfo",
+	    "WaitTime": 60,
+	    "Next": "LookupTopFitPath",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeRawTransferDirectory": {
+	    "Comment": "Make the top-level directory for raw data storage on the transfer endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_rawdata_dir.endpoint_id",
+		"path.$": "$.top_rawdata_dir.path"
+	    },
+	    "ResultPath": "$.MakeRawTransferDirectory",
+	    "WaitTime": 60,
+	    "Next": "LookupTopFitPath"
+	},	
+	"LookupTopFitPath": {
+	    "Comment": "Look up the fit data path to determine whether the directory already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_fit_dir.endpoint_id",
+		"path.$": "$.top_fit_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeTopFitDirectory",
+		    "ResultPath": "$.TopFitPathResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.TopFitPathInfo",
+	    "WaitTime": 60,
+	    "Next": "LookupTopConvertedPath",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeTopFitDirectory": {
+	    "Comment": "Make the top-level directory for fitted data storage on the transfer endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_fit_dir.endpoint_id",
+		"path.$": "$.top_fit_dir.path"
+	    },
+	    "ResultPath": "$.MakeTopFitDirectory",
+	    "WaitTime": 60,
+	    "Next": "LookupTopConvertedPath"
+	},
+	"LookupTopConvertedPath": {
+	    "Comment": "Look up the ROOT-converted data path to determine whether the directory already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_converted_dir.endpoint_id",
+		"path.$": "$.top_converted_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeTopConvertedDirectory",
+		    "ResultPath": "$.TopConvertedPathResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.TopConvertedPathInfo",
+	    "WaitTime": 60,
+	    "Next": "LookupTopAnalysisPath",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeTopConvertedDirectory": {
+	    "Comment": "Make the top-level directory for ROOT-converted data storage on the transfer endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_converted_dir.endpoint_id",
+		"path.$": "$.top_converted_dir.path"
+	    },
+	    "ResultPath": "$.MakeTopConvertedDirectory",
+	    "WaitTime": 60,
+	    "Next": "LookupTopAnalysisPath"
+	},
+	"LookupTopAnalysisPath": {
+	    "Comment": "Look up the pipeline output path on the receiver endpoint to determine whether the directory already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_analyzed_dir.endpoint_id",
+		"path.$": "$.top_analyzed_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeTopAnalysisDirectory",
+		    "ResultPath": "$.TopAnalysisPathResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.TopAnalysisPathInfo",
+	    "WaitTime": 60,
+	    "Next": "LookupLogPath",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeTopAnalysisDirectory": {
+	    "Comment": "Make the top-level directory for analyzed data storage on the receiver endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.top_analyzed_dir.endpoint_id",
+		"path.$": "$.top_analyzed_dir.path"
+	    },
+	    "ResultPath": "$.MakeTopAnalysisDirectory",
+	    "WaitTime": 60,
+	    "Next": "LookupLogPath"
+	},	
+	"LookupLogPath": {
+	    "Comment": "Look up the logging output path to determine whether the directory already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.compute_log_dir.endpoint_id",
+		"path.$": "$.compute_log_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeLogDirectory",
+		    "ResultPath": "$.LogPathResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.LogPathInfo",
+	    "WaitTime": 60,
+	    "Next": "TransferRawData",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeLogDirectory": {
+	    "Comment": "Make the top-level directory for ROOT-converted data storage on the transfer endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.compute_log_dir.endpoint_id",
+		"path.$": "$.compute_log_dir.path"
+	    },
+	    "ResultPath": "$.MakeLogDirectory",
+	    "WaitTime": 60,
+	    "Next": "TransferRawData"
+	},
+        "TransferRawData": {
+            "Comment": "Transfer raw data file(s)",
+            "Type": "Action",
+            "ActionUrl": "https://actions.automate.globus.org/transfer/transfer",
+            "Parameters": {
+                "source_endpoint_id.$": "$.rawdata.source.id",
+                "destination_endpoint_id.$": "$.rawdata.destination.id",
+                "transfer_items": [
+                    {
+                        "source_path.$": "$.rawdata.source.path",
+                        "destination_path.$": "$.rawdata.destination.path",
+			"recursive.$": "$.rawdata.recursive_tx"
+                    }
+                ]
+            },
+            "ResultPath": "$.TransferRawData",
+            "WaitTime": 600,
+            "Next": "LookupFitPath"
+        },
+	"LookupFitPath": {
+	    "Comment": "Look up the fit data run directory to determine whether it already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.fit_dir.endpoint_id",
+		"path.$": "$.fit_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeFitDirectory",
+		    "ResultPath": "$.FitPathErrorResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.FitPathInfo",
+	    "WaitTime": 60,
+	    "Next": "FitData",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeFitDirectory": {
+	    "Comment": "Make the run directory for fit data storage on the transfer endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.fit_dir.endpoint_id",
+		"path.$": "$.fit_dir.path"
+	    },
+	    "ResultPath": "$.MakeFitDirectory",
+	    "WaitTime": 60,
+	    "Next": "FitData"
+	},
+	"FitData": {
+	    "Comment": "Fit data using Globus compute",
+	    "Type": "Action",
+	    "ActionUrl": "https://compute.actions.globus.org/",
+	    "Parameters": {
+                "endpoint.$": "$.fit.endpoint",
+                "function.$": "$.fit.function",
+                "kwargs.$": "$.fit.kwargs"
+	    },
+	    "Catch": [
+		{
+		    "Next": "ComputeFailureHandler",
+		    "ResultPath": "$.ComputeErrorResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.FitData",
+	    "WaitTime": 1800,
+	    "Next": "LookupConvertedPath"
+	},
+	"LookupConvertedPath": {
+	    "Comment": "Look up the ROOT-converted data run directory to determine whether it already exists",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/ls",
+	    "Parameters": {
+		"endpoint_id.$": "$.converted_dir.endpoint_id",
+		"path.$": "$.converted_dir.path"
+	    },
+	    "Catch": [
+		{
+		    "Next": "MakeConvertedDirectory",
+		    "ResultPath": "$.ConvertedPathErrorResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.ConvertedPathInfo",
+	    "WaitTime": 60,
+	    "Next": "ConvertData",
+	    "ExceptionOnActionFailure": true
+	},
+	"MakeConvertedDirectory": {
+	    "Comment": "Make the run directory for ROOT-converted data storage on the transfer endpoint",
+	    "Type": "Action",
+	    "ActionUrl": "https://actions.globus.org/transfer/mkdir",
+	    "Parameters": {
+		"endpoint_id.$": "$.converted_dir.endpoint_id",
+		"path.$": "$.converted_dir.path"
+	    },
+	    "ResultPath": "$.MakeConvertedDirectory",
+	    "WaitTime": 60,
+	    "Next": "ConvertData"
+	},
+	"ConvertData": {
+	    "Comment": "Convert data to ROOT using Globus compute",
+	    "Type": "Action",
+	    "ActionUrl": "https://compute.actions.globus.org/",
+	    "Parameters": {
+                "endpoint.$": "$.convert.endpoint",
+                "function.$": "$.convert.function",
+                "kwargs.$": "$.convert.kwargs"
+	    },
+	    "Catch": [
+		{
+		    "Next": "ComputeFailureHandler",
+		    "ResultPath": "$.ComputeErrorResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.ConvertData",
+	    "WaitTime": 1800,
+	    "Next": "AnalyzeData"
+	},
+	"AnalyzeData": {
+	    "Comment": "Analyze data using betasort",
+	    "Type": "Action",
+	    "ActionUrl": "https://compute.actions.globus.org/",
+	    "Parameters": {
+                "endpoint.$": "$.analyze.endpoint",
+                "function.$": "$.analyze.function",
+                "kwargs.$": "$.analyze.kwargs"
+	    },
+	    "Catch": [
+		{
+		    "Next": "ComputeFailureHandler",
+		    "ResultPath": "$.ComputeErrorResult",
+		    "ErrorEquals": [
+			"ActionUnableToRun",
+			"ActionFailedException",
+			"ActionTimeout"
+		    ]
+		}
+	    ],
+	    "ResultPath": "$.AnalyzeData",
+	    "WaitTime": 14400,
+	    "Next": "TransferPipelineOutput"
+	},
+	"TransferPipelineOutput": {
+            "Comment": "Transfer analysis output to its final destination",
+            "Type": "Action",
+            "ActionUrl": "https://actions.automate.globus.org/transfer/transfer",
+            "Parameters": {
+                "source_endpoint_id.$": "$.pipeline_output.source.id",
+                "destination_endpoint_id.$": "$.pipeline_output.destination.id",
+                "transfer_items": [
+                    {
+                        "source_path.$": "$.pipeline_output.source.path",
+                        "destination_path.$": "$.pipeline_output.destination.path",
+                        "recursive.$": "$.pipeline_output.recursive_tx"
+                    }
+                ]
+            },
+            "ResultPath": "$.TransferPipelineOutput",
+            "WaitTime": 600,
+            "Next": "EndFlow"
+        },
+	"EndFlow": {
+	    "End": true,
+	    "Type": "Pass"
+	},
+	"ComputeFailureHandler": {
+	    "Type": "Fail",
+	    "Cause": "ComputeFailue",
+	    "Error": "See state in $.ComputeErrorResult of the run output",
+	    "Comment": "Report the error and end the flow execution"
+	}
+    }
+}

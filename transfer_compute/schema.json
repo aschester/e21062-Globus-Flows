@@ -1,0 +1,358 @@
+{
+    "required": [
+	"top_rawdata_dir",
+	"top_fit_dir",
+	"top_converted_dir",
+	"top_analyzed_dir",
+	"compute_log_dir",
+        "rawdata",
+	"fit_dir",
+	"fit",
+	"converted_dir",
+	"convert",
+	"analyze",
+	"pipeline_output"
+    ],
+    "properties": {
+	"top_rawdata_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"top_fit_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"top_converted_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"top_analyzed_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"compute_log_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+        "rawdata": {
+            "type": "object",
+            "required": [
+                "source",
+                "destination",
+                "recursive_tx"
+            ],
+            "properties": {
+                "source": {
+                    "type": "object",
+                    "title": "Select source collection and path",
+                    "description": "The source collection and path",
+                    "format": "globus-collection",
+                    "required": [
+                        "id",
+                        "path"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+			},
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "destination": {
+                    "type": "object",
+                    "title": "Select destination collection and path",
+                    "description": "The destination collection and path",
+                    "format": "globus-collection",
+                    "required": [
+                        "id",
+                        "path"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "recursive_tx": {
+                    "type": "boolean",
+                    "title": "Recursive transfer",
+                    "description": "Whether or not to transfer recursively, must be true when transferring a directory.",
+                    "default": true
+                }
+            },
+	    "additionalProperties": true
+        },
+	"fit_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"fit": {
+	    "type": "object",
+	    "required": [],
+	    "properties": {
+		"endpoint": {
+		    "type": "string",
+		    "format": "uuid",
+		    "description": "The endpoint UUID"
+		},
+		"function": {
+		    "type": "string",
+		    "format": "uuid",
+		    "description": "The function UUID, ie from client.register_function()"
+		},
+		"kwargs": {
+		    "type": "object",
+		    "description": "Function inputs",
+		    "properties": {
+			"endpoint_id": {
+			    "type": "string",
+			    "format": "uuid"
+			},
+			"function_id": {
+			    "type": "string",
+			    "format": "uuid"
+			},
+			"ncpus": {
+			    "type": "integer"
+			},
+			"input_path": {
+			    "type": "string"
+			}
+		    },
+		    "additionalProperties": false
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"converted_dir": {
+	    "type": "object",
+	    "required": [
+		"endpoint_id",
+		"path"
+	    ],
+	    "properties": {
+		"endpoint_id": {
+		    "type": "string",
+                    "format": "uuid"
+		},
+		"path": {
+		    "type": "string"
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"convert": {
+	    "type": "object",
+	    "required": [],
+	    "properties": {
+		"endpoint": {
+		    "type": "string",
+		    "format": "uuid",
+		    "description": "The endpoint UUID"
+		},
+		"function": {
+		    "type": "string",
+		    "format": "uuid",
+		    "description": "The function UUID, ie from client.register_function()"
+		},
+		"kwargs": {
+		    "type": "object",
+		    "description": "Function inputs",
+		    "properties": {
+			"endpoint_id": {
+			    "type": "string",
+			    "format": "uuid"
+			},
+			"function_id": {
+			    "type": "string",
+			    "format": "uuid"
+			},
+			"ncpus": {
+			    "type": "integer"
+			},
+			"input_path": {
+			    "type": "string"
+			}
+		    },
+		    "additionalProperties": false
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"analyze": {
+	    "type": "object",
+	    "required": [],
+	    "properties": {
+		"endpoint": {
+		    "type": "string",
+		    "format": "uuid",
+		    "description": "The endpoint UUID"
+		},
+		"function": {
+		    "type": "string",
+		    "format": "uuid",
+		    "description": "The function UUID, ie from client.register_function()"
+		},
+		"kwargs": {
+		    "type": "object",
+		    "description": "Function inputs",
+		    "properties": {
+			"ncpus": {
+			    "type": "integer"
+			},
+			"run": {
+			    "type": "integer"
+			}
+		    },
+		    "additionalProperties": false
+		}
+	    },
+	    "additionalProperties": false
+	},
+	"pipeline_output": {
+            "type": "object",
+            "required": [
+                "source",
+                "destination",
+                "recursive_tx"
+            ],
+            "properties": {
+                "source": {
+                    "type": "object",
+                    "title": "Select source collection and path",
+                    "description": "The source collection and path",
+                    "format": "globus-collection",
+                    "required": [
+                        "id",
+                        "path"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+			},
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "destination": {
+                    "type": "object",
+                    "title": "Select destination collection and path",
+                    "description": "The destination collection and path",
+                    "format": "globus-collection",
+                    "required": [
+                        "id",
+                        "path"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+			},
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "recursive_tx": {
+                    "type": "boolean",
+                    "title": "Recursive transfer",
+                    "description": "Whether or not to transfer recursively, must be true when transferring a directory.",
+                    "default": true
+                }
+            },
+            "additionalProperties": true
+        }
+    },
+    "additionalProperties": false
+}
