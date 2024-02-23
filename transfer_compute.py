@@ -172,14 +172,14 @@ def run_flow(event_file=None):
                 'path': transfer_path,
             },
             'filter_rules': [
-		{
+                {
 		    'DATA_TYPE': 'filter_rule',
 		    'method': 'exclude',
 		    'type': 'file',
 		    'name': '.exited'
-		}
+                }
 	    ],
-            'sync_level': 0,
+            'sync_level': 3,
             'notify_on_succeeded': False,
             'notify_on_failed': True,
             'notify_on_inactive': True,
@@ -230,7 +230,7 @@ def run_flow(event_file=None):
                 'id': frib_dtn_id,
                 'path': pipeline_output
             },
-            'sync_level': 0,
+            'sync_level': 3,
             'notify_on_succeeded': False,
             'notify_on_failed': True,
             'notify_on_inactive': True,

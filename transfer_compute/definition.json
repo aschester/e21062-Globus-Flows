@@ -187,15 +187,20 @@
             "Type": "Action",
             "ActionUrl": "https://actions.automate.globus.org/transfer/transfer",
             "Parameters": {
-                "source_endpoint_id.$": "$.rawdata.source.id",
-                "destination_endpoint_id.$": "$.rawdata.destination.id",
-                "transfer_items": [
+                "source_endpoint.$": "$.rawdata.source.id",
+                "destination_endpoint.$": "$.rawdata.destination.id",
+                "DATA": [
                     {
                         "source_path.$": "$.rawdata.source.path",
                         "destination_path.$": "$.rawdata.destination.path",
 			"recursive.$": "$.rawdata.recursive_tx"
                     }
-                ]
+                ],
+		"filter_rules.$": "$.rawdata.filter_rules",
+		"sync_level.$": "$.rawdata.sync_level",
+		"notify_on_succeeded.$": "$.rawdata.notify_on_succeeded",
+		"notify_on_failed.$": "$.rawdata.notify_on_failed",
+		"notify_on_inactive.$": "$.rawdata.notify_on_inactive"
             },
             "ResultPath": "$.TransferRawData",
             "WaitTime": 600,
@@ -350,15 +355,19 @@
             "Type": "Action",
             "ActionUrl": "https://actions.automate.globus.org/transfer/transfer",
             "Parameters": {
-                "source_endpoint_id.$": "$.pipeline_output.source.id",
-                "destination_endpoint_id.$": "$.pipeline_output.destination.id",
-                "transfer_items": [
+                "source_endpoint.$": "$.pipeline_output.source.id",
+                "destination_endpoint.$": "$.pipeline_output.destination.id",
+                "DATA": [
                     {
                         "source_path.$": "$.pipeline_output.source.path",
                         "destination_path.$": "$.pipeline_output.destination.path",
                         "recursive.$": "$.pipeline_output.recursive_tx"
                     }
-                ]
+                ],
+		"sync_level.$": "$.pipeline_output.sync_level",
+		"notify_on_succeeded.$": "$.pipeline_output.notify_on_succeeded",
+		"notify_on_failed.$": "$.pipeline_output.notify_on_failed",
+		"notify_on_inactive.$": "$.pipeline_output.notify_on_inactive" 
             },
             "ResultPath": "$.TransferPipelineOutput",
             "WaitTime": 600,

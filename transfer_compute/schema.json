@@ -147,6 +147,48 @@
                     },
                     "additionalProperties": false
                 },
+		"filter_rules": {
+		    "type": "array",
+		    "items": {
+			"type": "object",
+			"required": [
+			    "DATA_TYPE",
+			    "method",
+			    "type",
+			    "name"
+			],
+			"properties": {
+			    "DATA_TYPE": {
+				"type": "string"
+			    },
+			    "method": {
+				"type": "string"
+			    },
+			    "type": {
+				"type": "string"
+			    },
+			    "name": {
+				"type": "string"
+			    }
+			}
+		    }
+		},
+		"sync_level": {
+		    "type": "integer",
+		    "default": 0
+		},
+		"notify_on_succeeded": {
+		    "type": "boolean",
+		    "default": false
+		},
+		"notify_on_failed": {
+		    "type": "boolean",
+		    "default": true
+		},
+		"notify_on_inactive": {
+		    "type": "boolean",
+		    "default": true
+		},
                 "recursive_tx": {
                     "type": "boolean",
                     "title": "Recursive transfer",
@@ -344,14 +386,30 @@
                     },
                     "additionalProperties": false
                 },
+		"sync_level": {
+		    "type": "integer",
+		    "default": 0
+		},
+		"notify_on_succeeded": {
+		    "type": "boolean",
+		    "default": false
+		},
+		"notify_on_failed": {
+		    "type": "boolean",
+		    "default": true
+		},
+		"notify_on_inactive": {
+		    "type": "boolean",
+		    "default": true
+		},
                 "recursive_tx": {
                     "type": "boolean",
                     "title": "Recursive transfer",
                     "description": "Whether or not to transfer recursively, must be true when transferring a directory.",
-                    "default": true
+                    "default": false
                 }
             },
-            "additionalProperties": true
+            "additionalProperties": false
         }
     },
     "additionalProperties": false
