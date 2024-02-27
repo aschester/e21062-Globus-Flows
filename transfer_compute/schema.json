@@ -237,14 +237,13 @@
 			    "type": "string",
 			    "format": "uuid"
 			},
-			"function_id": {
-			    "type": "string",
-			    "format": "uuid"
-			},
 			"ncpus": {
 			    "type": "integer"
 			},
 			"input_path": {
+			    "type": "string"
+			},
+			"output_path": {
 			    "type": "string"
 			}
 		    },
@@ -292,14 +291,13 @@
 			    "type": "string",
 			    "format": "uuid"
 			},
-			"function_id": {
-			    "type": "string",
-			    "format": "uuid"
-			},
 			"ncpus": {
 			    "type": "integer"
 			},
 			"input_path": {
+			    "type": "string"
+			},
+			"output_path": {
 			    "type": "string"
 			}
 		    },
@@ -326,11 +324,18 @@
 		    "type": "object",
 		    "description": "Function inputs",
 		    "properties": {
+			"endpoint_id": {
+			    "type": "string",
+			    "format": "uuid"
+			},
 			"ncpus": {
 			    "type": "integer"
 			},
-			"run": {
-			    "type": "integer"
+			"input_path": {
+			    "type": "string"
+			},
+			"output_path": {
+			    "type": "string"
 			}
 		    },
 		    "additionalProperties": false

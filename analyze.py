@@ -9,32 +9,34 @@ import argparse
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
 )
 
 from globus_compute_sdk import Client
 
 
-# Registered as: f097b86b-6305-4946-beac-9e03abe5955d
+# Registered as: d6415d90-9e30-46a1-80d9-7d65a48e0cb1
 
 
-def analyze(ncpus=1, run=None):
+def analyze(endpoint_id, ncpus, input_path, output_path):
     """Registered function to analyze data with the Liddick group betasort.
 
     Parameters
     ----------
+    endpoint_id : str
+        Endpoint UUID where the function is run.
     ncpus : int
         Number of CPUs per task.
-    run : int
-        The run number without leading zeroes.
+    input_path : str
+        Input data path contining the files to analyze.
+    output_path : str
+        Output path for analyzed data.
 
-    Raises
+    Throws
     ------
     RuntimeError
-        If a run number is not passed as an argument.
-    CalledProcessError
-        If subprocess.run return code != 0.
+        No datafiles found in the input path.
 
     Returns
     -------
@@ -42,21 +44,73 @@ def analyze(ncpus=1, run=None):
         0 (Success).
 
     """
-    import subprocess
-    if run is None:
-        raise RuntimeError('Expected run number as argument but got None!')
-    process = subprocess.run(
-        f'srun -N 1 -c {ncpus} shifter '
-        f'--env-file=/global/homes/c/chester/shifter.env '
-        f'/global/homes/c/chester/globus_flows/run_compute_analyze.sh '
-        f'{run}'.split(),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
-    process.check_returncode() # throws if non-zero
+    import os
+    import fnmatch
+    from globus_compute_sdk import Executor
+    import concurrent.futures
     
-    return process.returncode  # return 0 (success)
+    def callback(ncpus, input_path, output_path, run, nsegs):
+        """Callback function to run using the Executor.
 
+        Parameters
+        ----------
+        ncpus : int
+            Number of CPUs to allocate for the job.
+        input_path : str
+            Path to input converted files, mounted at /input in the image.
+        output_path : str
+            Path to output analyzed files, mounted at /output in the image.
+        run : int
+            Run number to analyze.
+        nsegs : int
+            Number of segments to include in the analysis.
+
+        Throws
+        ------
+        CalledProcessError
+            If subprocess.run return code != 0.
+
+        Returns
+        -------
+        int
+            0 if success.
+
+        """
+        import subprocess
+        process = subprocess.run(
+            f"srun -N 1 -c {ncpus} shifter "
+            "--image=fribdaq/frib-buster:v4.2 "
+            f"--volume=/global/cfs/cdirs/m4386/opt-buster:/usr/opt;{input_path}:/input;{output_path}:/output;/global/cscratch1/sd/chester/tmpfiles:/tmp:perNodeCache=size=100G "
+            "--module=none "
+            "--env-file=/global/homes/c/chester/shifter.env "
+            "/global/homes/c/chester/globus_flows/run_compute_analyze.sh "
+            f"{run} {nsegs}".split(),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        process.check_returncode() # throws if non-zero
+    
+        return process.returncode  # return 0 (success)
+
+    # Configure the job:
+
+    run = os.path.basename(input_path).replace("run", "")
+    segments = len(fnmatch.filter(os.listdir(input_path), "*.root"))
+
+    if segments == 0:
+        raise RuntimeError(f"No event files in {input_path}!")
+    
+    # Run the function:
+    
+    with Executor(endpoint_id=endpoint_id) as gce:
+        future = gce.submit(
+            callback, ncpus, input_path, output_path, run, segments
+        )
+        # Must handle results inside the `with` statement before implicit
+        # invocation of `.shutdown()`.
+        result = future.result()
+            
+    return result
 
 def register_function():
     """Register the fitting function and return its UUID.
@@ -64,8 +118,8 @@ def register_function():
     """
     gcc = Client()
     uuid = gcc.register_function(
-        analyze, function_name='analyze',
-        description='Analyze data with betasort'
+        analyze, function_name="analyze",
+        description="Analyze data with betasort"
     )
     
     return uuid    
@@ -76,22 +130,22 @@ def parse_args():
 
     """
     parser = argparse.ArgumentParser(
-        description='Betasort analysis'
+        description="Betasort analysis"
     )
     parser.add_argument(
-        '-r', '--register',
-        action='store_true',
-        help='(Optional) Re-register the compute function.'
+        "-r", "--register",
+        action="store_true",
+        help="(Optional) Re-register the compute function."
     )
 
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """main: Optionally re-register the function.
 
     """
     args = parse_args()
     if (args.register):
         uuid = register_function()
-        print(f'Betasort analysis function UUID: {uuid}')
+        print(f"Betasort analysis function UUID: {uuid}")

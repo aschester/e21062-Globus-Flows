@@ -8,7 +8,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.top_rawdata_dir.endpoint_id",
-		"path.$": "$.top_rawdata_dir.path"
+		"path.$": "$.top_rawdata_dir.path",
+		"filter": "name:!~*/type:dir"
 	    },
 	    "Catch": [
 		{
@@ -44,7 +45,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.top_fit_dir.endpoint_id",
-		"path.$": "$.top_fit_dir.path"
+		"path.$": "$.top_fit_dir.path",
+		"filter": "name:!~*/type:dir"
 	    },
 	    "Catch": [
 		{
@@ -80,7 +82,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.top_converted_dir.endpoint_id",
-		"path.$": "$.top_converted_dir.path"
+		"path.$": "$.top_converted_dir.path",
+		"filter": "name:!~*/type:dir"
 	    },
 	    "Catch": [
 		{
@@ -116,7 +119,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.top_analyzed_dir.endpoint_id",
-		"path.$": "$.top_analyzed_dir.path"
+		"path.$": "$.top_analyzed_dir.path",
+		"filter": "name:!~*/type:file"
 	    },
 	    "Catch": [
 		{
@@ -152,7 +156,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.compute_log_dir.endpoint_id",
-		"path.$": "$.compute_log_dir.path"
+		"path.$": "$.compute_log_dir.path",
+		"filter": "name:!~*/type:file"
 	    },
 	    "Catch": [
 		{
@@ -212,7 +217,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.fit_dir.endpoint_id",
-		"path.$": "$.fit_dir.path"
+		"path.$": "$.fit_dir.path",
+		"filter": "name:!~*/type:file"
 	    },
 	    "Catch": [
 		{
@@ -272,7 +278,8 @@
 	    "ActionUrl": "https://actions.globus.org/transfer/ls",
 	    "Parameters": {
 		"endpoint_id.$": "$.converted_dir.endpoint_id",
-		"path.$": "$.converted_dir.path"
+		"path.$": "$.converted_dir.path",
+		"filter": "name:!~*/type:file"
 	    },
 	    "Catch": [
 		{

@@ -12,7 +12,7 @@ from globus_sdk.tokenstorage import SimpleJSONFileAdapter
 
 # Tokens and refresh tokens will be stored in this file; secure it!!
 TOKEN_FILE_ADAPTER = SimpleJSONFileAdapter(
-    os.path.expanduser('~/.globus-flows-tokens.json')
+    os.path.expanduser("~/.globus-flows-tokens.json")
 )
 
 SERVICE_SCOPES = [
@@ -27,11 +27,11 @@ RESOURCE_SERVER = globus_sdk.FlowsClient.resource_server
 # Replace this with your own client ID; register a native application
 # client at https://app.globus.org/settings/developers
 # Default is 'FRIB Auth' in the 'FRIB Globus Flows' project
-CLIENT_ID = '59f19e1e-f1ce-4cb1-973c-8d893e89c0a9'
+CLIENT_ID = "59f19e1e-f1ce-4cb1-973c-8d893e89c0a9"
 
 CLIENT = globus_sdk.NativeAppAuthClient(CLIENT_ID)
 TRANSFER_ACTION_PROVIDER_SCOPE_STRING = (
-    'https://auth.globus.org/scopes/actions.globus.org/transfer/transfer'
+    "https://auth.globus.org/scopes/actions.globus.org/transfer/transfer"
 )
 
 
@@ -54,9 +54,9 @@ def get_tokens(scopes=None):
     )
     authorize_url = CLIENT.oauth2_get_authorize_url()
     print(
-        f'Log in at this URL and get authorization code:\n\n{authorize_url}\n'
+        f"Log in at this URL and get authorization code:\n\n{authorize_url}\n"
     )
-    auth_code = input('Enter authorization code here: ').strip()
+    auth_code = input("Enter authorization code here: ").strip()
     tokens = CLIENT.oauth2_exchange_code_for_tokens(auth_code)
       
     return tokens
@@ -81,7 +81,7 @@ def get_authorizer(flow_id=None, collection_ids=None):
     if flow_id:
         scopes = globus_sdk.SpecificFlowClient(flow_id).scopes
         resource_server = flow_id
-        scopes = scopes.make_mutable('user')
+        scopes = scopes.make_mutable("user")
     else:
         scopes = SERVICE_SCOPES
         resource_server = RESOURCE_SERVER
@@ -90,7 +90,7 @@ def get_authorizer(flow_id=None, collection_ids=None):
     if collection_ids:
         # Build a scope that will give the flow
         # access to specific mapped collections on your behalf
-        transfer_scope = globus_sdk.TransferClient.scopes.make_mutable('all')
+        transfer_scope = globus_sdk.TransferClient.scopes.make_mutable("all")
         transfer_action_provider_scope = MutableScope(
             TRANSFER_ACTION_PROVIDER_SCOPE_STRING
         )
@@ -98,7 +98,7 @@ def get_authorizer(flow_id=None, collection_ids=None):
         # If you declared and mapped collections above, add them to
         # the transfer scope
         for collection_id in collection_ids:
-            gcs_data_access_scope = GCSCollectionScopeBuilder(collection_id).make_mutable('data_access', optional=True)
+            gcs_data_access_scope = GCSCollectionScopeBuilder(collection_id).make_mutable("data_access", optional=True)
             transfer_scope.add_dependency(gcs_data_access_scope)
 
         transfer_action_provider_scope.add_dependency(transfer_scope)
@@ -118,10 +118,10 @@ def get_authorizer(flow_id=None, collection_ids=None):
         tokens = response.by_resource_server[resource_server]
         
     return globus_sdk.RefreshTokenAuthorizer(
-        tokens['refresh_token'],
+        tokens["refresh_token"],
         CLIENT,
-        access_token=tokens['access_token'],
-        expires_at=tokens['expires_at_seconds'],
+        access_token=tokens["access_token"],
+        expires_at=tokens["expires_at_seconds"],
         on_refresh=TOKEN_FILE_ADAPTER.on_refresh,
     )
 

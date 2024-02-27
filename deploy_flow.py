@@ -23,10 +23,10 @@ def deploy_flow():
     fc = create_flows_client()
 
     # Get flow and input schema definitions
-    with open(args.flowdef, 'r') as f:
+    with open(args.flowdef, "r") as f:
         flow_def = f.read()
 
-    with open(args.schema, 'r') as f:
+    with open(args.schema, "r") as f:
         schema = f.read()
 
     if args.flowid:
@@ -38,7 +38,7 @@ def deploy_flow():
             definition=json.loads(flow_def),
             input_schema=json.loads(schema),
         )
-        print(f'Updated flow {flow_id}')
+        print(f"Updated flow {flow_id}")
 
     else:
         # Deploy a new flow
@@ -47,10 +47,10 @@ def deploy_flow():
             definition=json.loads(flow_def),
             input_schema=json.loads(schema),
         )
-        flow_id = flow['id']
-        print(f'Deployed flow {flow_id}')
+        flow_id = flow["id"]
+        print(f"Deployed flow {flow_id}")
 
-    return flow_id, flow['globus_auth_scope']
+    return flow_id, flow["globus_auth_scope"]
 
 
 def parse_args():
@@ -58,34 +58,34 @@ def parse_args():
 
     """
     parser = argparse.ArgumentParser(
-        description='Deploy a flow for use with trigger examples.'
+        description="Deploy a flow for use with trigger examples."
     )
     parser.add_argument(
-        '--flowdef',
+        "--flowdef",
         required=True,
-        help='Name of file containing the flow definition.',
+        help="Name of file containing the flow definition.",
     )
     parser.add_argument(
-        '--schema',
+        "--schema",
         required=True,
-        help='Name of file containing the input schema definition.',
+        help="Name of file containing the input schema definition.",
     )
     parser.add_argument(
-        '--title',
-        default='My Example Flow',
+        "--title",
+        default="My Example Flow",
         help="Flow title. [default: 'My Example Flow']",
     )
     parser.add_argument(
-        '--flowid', help='Flow ID; used only when updating a flow definition'
+        "--flowid", help="Flow ID; used only when updating a flow definition"
     )
     parser.set_defaults(verbose=True)
 
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     """The main: Deploy the flow.
 
     """
     flow_id, scope = deploy_flow()
-    print(f'Deployed flow with ID : {flow_id}\nScope : {scope}')
+    print(f"Deployed flow with ID : {flow_id}\nScope : {scope}")
