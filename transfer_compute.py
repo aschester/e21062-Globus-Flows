@@ -196,7 +196,7 @@ def run_flow(event_file=None):
             "function": fit_function_id,
             "kwargs": {
                 "endpoint_id": compute_fit_ep_id,
-                "ncpus": 64,
+                "ncpus": 128,
                 "input_path": transfer_path,
                 "output_path": fit_path
             },

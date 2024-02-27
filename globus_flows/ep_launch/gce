@@ -1,0 +1,15 @@
+#!/bin/bash
+
+gce=$HOME/globus_flows/globus_compute_venv/bin/globus-compute-endpoint
+endpoints=("frib-analysis-multinode" "frib-analysis-singlenode")
+
+if test "$1" = "list"
+then
+   $gce $1
+else
+    for ep in ${endpoints[@]}
+    do
+	echo "----- $1 $ep -----"
+	$gce $1 $ep
+    done
+fi
