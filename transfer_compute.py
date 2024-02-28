@@ -56,27 +56,22 @@ def run_flow(event_file=None):
     # Get the run directory from the trigger file path or argument:
     
     if args.watchdir:
-        base_dir = event_file
+        base_dir       = event_file
         pipeline_input = base_dir.replace("/cephfs", "")
     else:
-        base_dir = args.rundir.rstrip("/")
+        base_dir       = args.rundir.rstrip("/")
         pipeline_input = args.rundir.replace("/cephfs", "")
         
     run_dir = os.path.basename(base_dir)
     run_num = int(run_dir[3:])
         
-    # Translate local input path to Globus path:
+    # Top level paths (on Globus):
 
-    # Top level paths (on Globus). These are mounted under the shifter image
-    # on the NERSC endpoint at /rawdata, /fitted, /converted, /analyzed.
-    # Volume mounts are defined in the compute endpoint config file as
-    # scheduler option:
-
-    transfer_toplevel  = "/global/cfs/cdirs/m4386/e21062_flows/rawdata"
-    fit_toplevel       = "/global/cfs/cdirs/m4386/e21062_flows/fitted"
-    converted_toplevel = "/global/cfs/cdirs/m4386/e21062_flows/converted"
-    analyzed_toplevel = "/global/cfs/cdirs/m4386/e21062_flows/analyzed"
-    analyzed_output_fname = f"run-{run_dir[3:]}-sorted.root"
+    transfer_toplevel     = "/global/cfs/cdirs/m4386/e21062_flows/rawdata"
+    fit_toplevel          = "/global/cfs/cdirs/m4386/e21062_flows/fitted"
+    converted_toplevel    = "/global/cfs/cdirs/m4386/e21062_flows/converted"
+    analyzed_toplevel     = "/global/cfs/cdirs/m4386/e21062_flows/analyzed"
+    analyzed_output_fname = f"run-{run_num}-sorted.root"
 
     # Configure paths for pipeline steps:
 
@@ -133,7 +128,7 @@ def run_flow(event_file=None):
     fc = create_flows_client(
         flow_id=flow_id, collection_ids=[frib_dtn_id, nersc_dtn_id]
     )
-    flow_label = f"FRIB-NERSC Analysis Pipline Run {run_num}"
+    flow_label = f"FRIB-NERSC Analysis Pipeline Run {run_num}"
 
     # Flow input schema:
 
@@ -277,6 +272,7 @@ def endpoint_online(endpoint_id):
     -------
     bool
         True if the endpoint is online, False otherwise.
+
     """
     gcc = Client()
     name = gcc.get_endpoint_metadata(endpoint_id)["name"]
@@ -290,29 +286,6 @@ def endpoint_online(endpoint_id):
     
     return True
 
-
-def latest_mod_time(path):
-    """Find the newest file modification time in the provided path.
-
-    Parameters
-    ----------
-    path : str
-        Directory path containing files to check.
-    
-    Returns
-    -------
-    float
-        The latest file modification time in seconds.
-
-    """
-    files = [entry.path for entry in os.scandir(path) if entry.is_file()]
-    # Sometimes between the list construction and mtime check a temporary
-    # file from rsync is renamed and no longer exists. Make sure the file
-    # exists before getting the modification times or sometimes crash out:
-    mod_times = [os.path.getmtime(f) for f in files if os.path.exists(f)]
-    
-    return min([time.time() - t for t in mod_times])
-    
 
 def parse_args():
     """Parse arguments and return an argparse.Namespace.

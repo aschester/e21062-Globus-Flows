@@ -1,0 +1,107 @@
+{
+    "required": [
+        "transfer"
+    ],
+    "properties": {
+        "transfer": {
+            "type": "object",
+            "required": [
+                "source",
+                "destination",
+                "recursive_tx"
+            ],
+            "properties": {
+                "source": {
+                    "type": "object",
+                    "title": "Select source collection and path",
+                    "description": "The source collection and path",
+                    "format": "globus-collection",
+                    "required": [
+                        "id",
+                        "path"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+			},
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "destination": {
+                    "type": "object",
+                    "title": "Select destination collection and path",
+                    "description": "The destination collection and path",
+                    "format": "globus-collection",
+                    "required": [
+                        "id",
+                        "path"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "format": "uuid"
+                        },
+                        "path": {
+                            "type": "string"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+		"filter_rules": {
+		    "type": "array",
+		    "items": {
+			"type": "object",
+			"required": [
+			    "DATA_TYPE",
+			    "method",
+			    "type",
+			    "name"
+			],
+			"properties": {
+			    "DATA_TYPE": {
+				"type": "string"
+			    },
+			    "method": {
+				"type": "string"
+			    },
+			    "type": {
+				"type": "string"
+			    },
+			    "name": {
+				"type": "string"
+			    }
+			}
+		    }
+		},
+		"sync_level": {
+		    "type": "integer",
+		    "default": 0
+		},
+		"notify_on_succeeded": {
+		    "type": "boolean",
+		    "default": false
+		},
+		"notify_on_failed": {
+		    "type": "boolean",
+		    "default": true
+		},
+		"notify_on_inactive": {
+		    "type": "boolean",
+		    "default": true
+		},
+                "recursive_tx": {
+                    "type": "boolean",
+                    "title": "Recursive transfer",
+                    "description": "Whether or not to transfer recursively, must be true when transferring a directory.",
+                    "default": true
+                }
+            },
+	    "additionalProperties": true
+        }
+    },
+    "additionalProperties": false
+}

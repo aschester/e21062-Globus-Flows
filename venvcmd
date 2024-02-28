@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# Run args under python 3.10 image in the virutal env where we have the
+# Globus compute SDK installed.
+
+if command -v apptainer &>/dev/null
+then
+    apptainer exec --bind /mnt/cephfs $HOME/python-3.10-slim-bullseye-apptainer.img /mnt/cephfs/sci-dtn/flows-test/globus_compute_venv_python3.10/bin/python3 $@
+else
+    singularity exec --bind /mnt/cephfs $HOME/python-3.10-slim-bullseye.img /mnt/cephfs/sci-dtn/flows-test/globus_compute_venv_python3.10/bin/python3 $@
+fi
