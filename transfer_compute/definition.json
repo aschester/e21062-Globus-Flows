@@ -208,7 +208,7 @@
 		"notify_on_inactive.$": "$.rawdata.notify_on_inactive"
             },
             "ResultPath": "$.TransferRawData",
-            "WaitTime": 600,
+            "WaitTime": 3600,
             "Next": "LookupFitPath"
         },
 	"LookupFitPath": {
@@ -269,7 +269,7 @@
 		}
 	    ],
 	    "ResultPath": "$.FitData",
-	    "WaitTime": 1800,
+	    "WaitTime": 3600,
 	    "Next": "LookupConvertedPath"
 	},
 	"LookupConvertedPath": {
@@ -330,7 +330,7 @@
 		}
 	    ],
 	    "ResultPath": "$.ConvertData",
-	    "WaitTime": 1800,
+	    "WaitTime": 3600,
 	    "Next": "AnalyzeData"
 	},
 	"AnalyzeData": {
@@ -377,7 +377,7 @@
 		"notify_on_inactive.$": "$.pipeline_output.notify_on_inactive" 
             },
             "ResultPath": "$.TransferPipelineOutput",
-            "WaitTime": 600,
+            "WaitTime": 3600,
             "Next": "EndFlow"
         },
 	"EndFlow": {

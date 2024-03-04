@@ -237,9 +237,6 @@
 			    "type": "string",
 			    "format": "uuid"
 			},
-			"ncpus": {
-			    "type": "integer"
-			},
 			"input_path": {
 			    "type": "string"
 			},
@@ -291,9 +288,6 @@
 			    "type": "string",
 			    "format": "uuid"
 			},
-			"ncpus": {
-			    "type": "integer"
-			},
 			"input_path": {
 			    "type": "string"
 			},
@@ -327,9 +321,6 @@
 			"endpoint_id": {
 			    "type": "string",
 			    "format": "uuid"
-			},
-			"ncpus": {
-			    "type": "integer"
 			},
 			"input_path": {
 			    "type": "string"

@@ -79,6 +79,12 @@ def run_flow(event_file=None):
 		    "method": "exclude",
 		    "type": "file",
 		    "name": "*"
+                },
+                {
+		    "DATA_TYPE": "filter_rule",
+		    "method": "exclude",
+		    "type": "dir",
+		    "name": "*"
                 }
 	    ],
             "sync_level": 3,

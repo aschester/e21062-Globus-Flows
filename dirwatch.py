@@ -85,8 +85,7 @@ class DirectoryTrigger:
         seen = {d for d in os.listdir(self.watch_dir) if d.startswith("run")}
         
         # Look for new directories and start a flow run when a new directory
-        # has copied in all its data. Exceptions raised by the flow are
-        # handled here, as well as excptions raised by the thread(s):
+        # has copied in all its data.
         try:
             while True:
                 current = {
@@ -145,9 +144,20 @@ class DirectoryTrigger:
             Last mtime of the path: min of directory mtime and file(s) mtime.
 
         """
-        fmtimes = [
-            os.path.getmtime(f) for f in os.scandir(path) if f.is_file()
-        ]
+        # The sych'd files are renamed, which may happen as we try to get
+        # their mtime:
+        fmtimes = []
+        for f in os.scandir(path):
+            if f.is_file():
+                try:
+                    mtime = os.path.getmtime(f)
+                except FileNotFoundError as e:
+                    print(
+                        f"{f} does not exist! If it is a hidden file, "
+                        "ignore this warning as it likely has been renamed"
+                    )
+                else:
+                    fmtimes.append(mtime)
         # One of these is the latest mod time:
         fmtime = min([time.time() - t for t in fmtimes]) if fmtimes else 0
         dmtime = time.time() - os.path.getmtime(path)

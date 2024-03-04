@@ -1,7 +1,7 @@
 #!/bin/sh
 
 gce=$HOME/globus_flows/globus_compute_venv/bin/globus-compute-endpoint
-endpoints=("frib-analysis-singlenode" "frib-analysis-multinode")
+endpoints=("frib-fit-mpi" "frib-convert" "frib-analysis")
 
 for ep in ${endpoints[@]}
 do
