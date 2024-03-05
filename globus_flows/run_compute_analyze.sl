@@ -1,5 +1,15 @@
 #!/bin/bash
 
+##
+# @file run_compute_analyze.sl
+# @brief Submission script for running Liddick group betasort.
+# @param 1 Run number.
+# @param 2 Number of run segments. A value of 0 (zero) will select only the
+#          first segment.
+#
+# Usage: sbatch run_compute_analyze.sl <run> <segments>
+#
+
 #SBATCH -A m4386
 #SBATCH --licenses=scratch,cfs
 #SBATCH -q debug

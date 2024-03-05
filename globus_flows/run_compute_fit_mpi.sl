@@ -1,5 +1,14 @@
 #!/bin/bash
 
+##
+# @file run_compute_fit_mpi.sl
+# @brief Submission script for running MPI trace fitting.
+# @param 1 Run number.
+# @param 2 Segment number.
+#
+# Usage: sbatch run_compute_fit_mpi.sl <run> <segment>
+#
+
 #SBATCH -A m4386
 #SBATCH --licenses=scratch,cfs
 #SBATCH -q debug

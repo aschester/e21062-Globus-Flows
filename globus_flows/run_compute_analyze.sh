@@ -1,8 +1,12 @@
 #!/bin/bash
 
 ##
-# Liddick group betasort analysis. Stage I/O in /tmp space,
-# move tmp output to CFS on completion. Log the output.
+# @file run_compute_analyze.sh
+# @brief Run the Liddick group betasort code from in a containerized
+# environment. Stage I/O in /tmp space, move staged output to CFS on
+# completion. Log the output.
+# @param 1 Run number.
+# @param 2 Number of segments. If 0 (zero), sort only the first segment.
 #
 
 # Format input:
@@ -31,15 +35,15 @@ Image   $SHIFTER_IMAGEREQUEST
 EOF
 
 echo "Copying input..." >> $logfile
-cp -rv /input $tmpin 2>&1 >> $logfile
+cp -rv /input $tmpin >> $logfile 2>&1
 echo "... Done\n" >> $logfile
 
 # Build all segments into the TChain for analysis. The trailing slashes
 # on the dirs are necessary... sigh:
 /global/cfs/cdirs/m4386/e21062_flows/software/betasort/betasort \
-    $tmpin/ $tmpout/ $run $nsegs 2>&1 >> $logfile
+    $tmpin/ $tmpout/ $run $nsegs >> $logfile 2>&1
 
 echo "Moving output and cleaing up..." >> $logfile
-rm -vrf $tmpin/ 2>&1 >> $logfile
-mv -vf $tmpout/run-$fmtrun-sorted.root /output 2>&1 >> $logfile
+rm -vrf $tmpin/ >> $logfile 2>&1
+mv -vf $tmpout/run-$fmtrun-sorted.root /output >> $logfile 2>&1
 echo "... All done" >> $logfile

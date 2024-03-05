@@ -1,8 +1,12 @@
 #!/bin/bash
 
 ##
-# Run the EventEditor to fit traces in an .evt file. Stage I/O in /tmp space,
-# move tmp output to CFS on completion. Log the output.
+# @file run_compute_fit_mpi.sh
+# @brief Run the EventEditor to fit traces in an .evt file using MPI
+# parallelism from in a containerized environment. Stage I/O in /tmp space,
+# move staged output to CFS on completion. Log the output.
+# @param 1 Run number.
+# @param 2 Run segment.
 #
 
 # Configure the runtime environment in the container:
@@ -27,6 +31,7 @@ tmpout=/tmp/tmpout-$SLURM_JOB_ID-run-$run-$seg.evt
 #tmpout=$PSCRATCH/tmpout-$SLURM_JOB_ID-run-$run-$seg.evt
 
 tasks=$SLURM_CPUS_PER_TASK
+#tasks=$SLURM_NTASKS
 nworkers=`expr $tasks - 3` # 3 reserved for fan-in, fan-out, sort (MPI only!)
 
 # Using SLURM stdout and stderr redirection does not work for compute, as the
@@ -49,20 +54,22 @@ Image   $SHIFTER_IMAGEREQUEST
 EOF
 
 echo "Copying input..." >> $logfile
-cp -v $input $tmpin 2>&1 >> $logfile
+cp -v $input $tmpin >> $logfile 2>&1
 echo "... Done" >> $logfile
 
 # Run the fitter and write to our log:
 
-mpirun --use-hwthread-cpus --oversubscribe -np $tasks $DAQBIN/EventEditor \
+echo "Fitting traces with mpirun -np $tasks $DAQBIN/EventEditor..." >> $logfile
+mpirun --use-hwthread-cpus --oversubscribe -np $tasks \
+     $DAQBIN/EventEditor \
      -s file://$tmpin \
      -S file://$tmpout \
      -l /usr/opt/ddastoys/lib/libFitEditorAnalytic.so \
      -n $nworkers \
      -c 2000 \
-     -p mpi 2>&1 >> $logfile
+     -p mpi >> $logfile 2>&1
 
 echo "Moving output and cleaning up..." >> $logfile
-rm -vf $tmpin 2>&1 >> $logfile
-mv -vf $tmpout $output 2>&1 >> $logfile
+rm -vf $tmpin >> $logfile 2>&1 
+mv -vf $tmpout $output >> $logfile  2>&1
 echo "... All done" >> $logfile

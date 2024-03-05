@@ -1,5 +1,14 @@
 #!/bin/bash
 
+##
+# @file run_compute_convert.sl
+# @brief Submission script for converting EventEdited files to ROOT.
+# @param 1 Run number.
+# @param 2 Run segment.
+#
+# Usage: sbatch run_compute_convert.sl <run> <segment>
+#
+
 #SBATCH -A m4386
 #SBATCH --licenses=scratch,cfs
 #SBATCH -q debug

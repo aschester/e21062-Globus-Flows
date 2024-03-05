@@ -1,8 +1,12 @@
 #!/bin/bash
 
 ##
-# Convert EventEditor output to ROOT format. Stage I/O in /tmp space,
-# move tmp output to CFS on completion. Log the output.
+# @file run_compute_analyze.sh
+# @brief Convert EventEditor output too ROOT format in a containerized
+# environment. Stage I/O in /tmp space, move staged output to CFS on
+# completion. Log the output.
+# @param 1 Run number.
+# @param 2 Number of segments. If 0 (zero), sort only the first segment.
 #
 
 # Configure the runtime environment in the container:
@@ -41,12 +45,12 @@ Image   $SHIFTER_IMAGEREQUEST
 EOF
 
 echo "Copying input..." >> $logfile
-cp -v $input $tmpin 2>&1 >> $logfile
+cp -v $input $tmpin >> $logfile 2>&1
 echo "... Done" >> $logfile
 
-/usr/opt/ddastoys/bin/eeconverter -s file://$tmpin -f $tmpout 2>&1 >> $logfile
+/usr/opt/ddastoys/bin/eeconverter -s file://$tmpin -f $tmpout >> $logfile 2>&1
 
 echo "Moving output and cleaning up..." >> $logfile
-rm -vf $tmpin 2>&1 >> $logfile
-mv -vf $tmpout $output  2>&1 >> $logfile
+rm -vf $tmpin >> $logfile 2>&1
+mv -vf $tmpout $output >> $logfile 2>&1
 echo "... All done" >> $logfile
