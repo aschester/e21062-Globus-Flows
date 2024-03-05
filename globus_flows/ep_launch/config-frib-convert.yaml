@@ -1,6 +1,7 @@
 engine:
     type: HighThroughputEngine
     worker_debug: False
+    max_workers_per_node: 256
 
     strategy:
         type: SimpleStrategy
@@ -17,23 +18,22 @@ engine:
             type: SimpleLauncher
 
         # Options prepended to the submit script. Set #SBATCH directives here:
-        scheduler_options: "#SBATCH -q realtime -C cpu --licenses=scratch,cfs"
+        scheduler_options: "#SBATCH -q realtime -C cpu --licenses=scratch,cfs -n 1 -c 1"
 
-        # Job configuraton:
+        # Project account:
         account: m4386
 
-        # Command to be run before starting a worker
-        # e.g., "module load Anaconda; source activate parsl_env"
+        # Command(s) to be run before starting a worker:
         worker_init: module load python/3.10; source /global/homes/c/chester/globus_flows/globus_compute_venv/bin/activate
 
-        # increase the command timeouts
+        # Increase the command timeouts:
         cmd_timeout: 120
 
-        # Scale between 0-2 blocks with 1 nodes per block
+        # Define provisioned resources:
         nodes_per_block: 1
         init_blocks: 0
         min_blocks: 0
-        max_blocks: 1
+        max_blocks: 5
 
-        # Hold blocks for 2 hrs for analysis
-        walltime: 02:00:00
+        # Hold blocks for 1 hr for conversion to ROOT:
+        walltime: 01:00:00

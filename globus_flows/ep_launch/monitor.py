@@ -25,26 +25,31 @@ while True:
             f"Endpoint {name} on {hostname} with UUID {uuid} status: '{status}'"
         )
         
-        if status != "online":
-            logging.info(f"Starting endpoint {name} {uuid}")
+        tries = 0
+        restart = False
+        while status != "online" and tries < 10:
+            restart = True if not restart else None
+            logging.info(f"Attempting restart of endpoint {name} {uuid}...")
             subprocess.run(
-                f"/global/homes/c/chester/globus_flows/globus_compute_venv/bin/globus-compute-endpoint start {name}".split(),
+                f"/global/homes/c/chester/globus_flows/globus_compute_venv/bin/globus-compute-endpoint restart {name}".split(),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
-            
-            status = client.get_endpoint_status(uuid)["status"]
-            tries = 0
-            while status != "online" and tries < 10:
-                time.sleep(1)
-                status = client.get_endpoint_status(uuid)["status"]
-                tries = tries + 1
-                
+
+            # Wait a few seconds and poll the status:
+            time.sleep(10)
+            status = client.get_endpoint_status(uuid)["status"]            
+            tries = tries + 1
+
+        # Report if we've tried to restart the endpoints:
+        if restart:
             if status == "online":
                 logging.info(
                     f"Restarted endpoint {name} on {hostname} with UUID {uuid} status: '{status}'"
                 )
             else:
                 logging.error(f"ERROR: Failed to restart endpoint {name} on {hostname} with UUID {uuid}!")
+
+    # Monitoring interval:
     time.sleep(300)
                 

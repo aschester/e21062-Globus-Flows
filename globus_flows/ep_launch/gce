@@ -1,7 +1,7 @@
 #!/bin/bash
 
 gce=$HOME/globus_flows/globus_compute_venv/bin/globus-compute-endpoint
-endpoints=("frib-analysis-multinode" "frib-analysis-singlenode")
+endpoints=("frib-fit-mpi" "frib-convert" "frib-analysis")
 
 if test "$1" = "list"
 then

@@ -1,0 +1,34 @@
+{
+    "Comment": "Mediated transfer and analysis pipeline for FRIB data",
+    "StartAt": "Transfer",
+    "States": {
+        "Transfer": {
+            "Comment": "Transfer raw data file(s)",
+            "Type": "Action",
+            "ActionUrl": "https://actions.automate.globus.org/transfer/transfer",
+            "Parameters": {
+                "source_endpoint.$": "$.transfer.source.id",
+                "destination_endpoint.$": "$.transfer.destination.id",
+                "DATA": [
+                    {
+                        "source_path.$": "$.transfer.source.path",
+                        "destination_path.$": "$.transfer.destination.path",
+			"recursive.$": "$.transfer.recursive_tx"
+                    }
+                ],
+		"filter_rules.$": "$.transfer.filter_rules",
+		"sync_level.$": "$.transfer.sync_level",
+		"notify_on_succeeded.$": "$.transfer.notify_on_succeeded",
+		"notify_on_failed.$": "$.transfer.notify_on_failed",
+		"notify_on_inactive.$": "$.transfer.notify_on_inactive"
+            },
+            "ResultPath": "$.Transfer",
+            "WaitTime": 3600,
+            "Next": "EndFlow"
+        },
+	"EndFlow": {
+	    "End": true,
+	    "Type": "Pass"
+	}
+    }
+}

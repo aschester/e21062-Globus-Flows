@@ -12,8 +12,8 @@ import time
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
 )
 import threading
 
@@ -66,44 +66,43 @@ class DirectoryTrigger:
         """Monitor the watchdir and wait for events.
 
         """        
-        logging.root.info('Watcher Started\n')
+        logging.root.info("Watcher Started\n")
 
         if not self.FlowRunner:
-            logging.root.info('No callback function defined for events.')
-            logging.root.info('Using system print()')
+            logging.root.info("No callback function defined for events.")
+            logging.root.info("Using system print()")
             self.FlowRunner = print
 
         if not os.path.isdir(self.watch_dir):
-            logging.root.error('ERROR: Watch directory does not exist!')
+            logging.root.error("ERROR: Watch directory does not exist!")
             sys.exit(1)
 
         logging.root.info(
-            f'Monitoring: {self.watch_dir} with delay {self.delay}s\n'
+            f"Monitoring: {self.watch_dir} with delay {self.delay}s\n"
         )
 
         # What's in the directory to begin with:
-        seen = {d for d in os.listdir(self.watch_dir) if d.startswith('run')}
+        seen = {d for d in os.listdir(self.watch_dir) if d.startswith("run")}
         
         # Look for new directories and start a flow run when a new directory
-        # has copied in all its data. Exceptions raised by the flow are
-        # handled here, as well as excptions raised by the thread(s):
+        # has copied in all its data.
         try:
             while True:
                 current = {
-                    d for d in os.listdir(self.watch_dir) if d.startswith('run')
+                    d for d in os.listdir(self.watch_dir) if d.startswith("run")
                 }
                 new = seen ^ current
-                logging.root.debug(f'seen {seen} current {current} new {new}')
+                logging.root.debug(f"seen {seen} current {current} new {new}")
                 {threading.Thread(target=self.flow_thread,
                                   args=(os.path.join(self.watch_dir, n),),
                                   daemon=True).start() for n in new
                  } if new else None
                 seen = current
-                time.sleep(10)
+                time.sleep(300)
         except Exception as e:
-            logging.root.error(f'ERROR: {e}')
+            logging.root.error(f"ERROR: {e}")
         except:
-            logging.root.info('Watcher stopped.')
+            logging.root.info("Watcher stopped.")
 
             
     def flow_thread(self, path):
@@ -116,13 +115,17 @@ class DirectoryTrigger:
 
         """
         last_mtime = self.get_last_mtime(path)
+        logging.root.info(
+            f"New run directory: {os.path.abspath(path)} with mtime: "
+            f"{last_mtime}, flow will trigger when mtime > {self.delay}..."
+        )
         while last_mtime < self.delay:
             logging.root.debug(
-                f'last mtime: {last_mtime} < {self.delay}, wait for copy in...'
+                f"last mtime: {last_mtime} < {self.delay}, wait for copy in..."
             )
             time.sleep(5)
             last_mtime = self.get_last_mtime(path)
-        logging.root.info(f'Triggered: {os.path.abspath(path)}')
+        logging.root.info(f"Triggered: {os.path.abspath(path)}")
         self.FlowRunner(os.path.abspath(path)) # Runs the flow
 
 
@@ -141,8 +144,20 @@ class DirectoryTrigger:
             Last mtime of the path: min of directory mtime and file(s) mtime.
 
         """
-        files = [f for f in os.scandir(path) if f.is_file()]
-        fmtimes = [os.path.getmtime(f) for f in files if os.path.exists(f)]
+        # The sych'd files are renamed, which may happen as we try to get
+        # their mtime:
+        fmtimes = []
+        for f in os.scandir(path):
+            if f.is_file():
+                try:
+                    mtime = os.path.getmtime(f)
+                except FileNotFoundError as e:
+                    print(
+                        f"{f} does not exist! If it is a hidden file, "
+                        "ignore this warning as it likely has been renamed"
+                    )
+                else:
+                    fmtimes.append(mtime)
         # One of these is the latest mod time:
         fmtime = min([time.time() - t for t in fmtimes]) if fmtimes else 0
         dmtime = time.time() - os.path.getmtime(path)

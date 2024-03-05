@@ -1,4 +1,6 @@
+devel/
 backup/
 __pycache__/
 
 *~
+*.log

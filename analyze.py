@@ -16,18 +16,16 @@ logging.basicConfig(
 from globus_compute_sdk import Client
 
 
-# Registered as: d6415d90-9e30-46a1-80d9-7d65a48e0cb1
+# Registered as: 62f120cd-9249-4124-b9df-44f8e1c44fe1
 
 
-def analyze(endpoint_id, ncpus, input_path, output_path):
+def analyze(endpoint_id, input_path, output_path):
     """Registered function to analyze data with the Liddick group betasort.
 
     Parameters
     ----------
     endpoint_id : str
         Endpoint UUID where the function is run.
-    ncpus : int
-        Number of CPUs per task.
     input_path : str
         Input data path contining the files to analyze.
     output_path : str
@@ -40,8 +38,8 @@ def analyze(endpoint_id, ncpus, input_path, output_path):
 
     Returns
     -------
-    int
-        0 (Success).
+    tuple : int, str, str
+        (returncode, stdout, stderr). (0, "", "") if success.
 
     """
     import os
@@ -49,13 +47,11 @@ def analyze(endpoint_id, ncpus, input_path, output_path):
     from globus_compute_sdk import Executor
     import concurrent.futures
     
-    def callback(ncpus, input_path, output_path, run, nsegs):
+    def callback(input_path, output_path, run, nsegs):
         """Callback function to run using the Executor.
 
         Parameters
         ----------
-        ncpus : int
-            Number of CPUs to allocate for the job.
         input_path : str
             Path to input converted files, mounted at /input in the image.
         output_path : str
@@ -72,25 +68,20 @@ def analyze(endpoint_id, ncpus, input_path, output_path):
 
         Returns
         -------
-        int
-            0 if success.
+        tuple : int, str, str
+            (returncode, stdout, stderr). (0, "", "") if success.
 
         """
         import subprocess
-        process = subprocess.run(
-            f"srun -N 1 -c {ncpus} shifter "
-            "--image=fribdaq/frib-buster:v4.2 "
-            f"--volume=/global/cfs/cdirs/m4386/opt-buster:/usr/opt;{input_path}:/input;{output_path}:/output;/global/cscratch1/sd/chester/tmpfiles:/tmp:perNodeCache=size=100G "
-            "--module=none "
-            "--env-file=/global/homes/c/chester/shifter.env "
-            "/global/homes/c/chester/globus_flows/run_compute_analyze.sh "
-            f"{run} {nsegs}".split(),
+        p = subprocess.run(
+            f"shifter --image=fribdaq/frib-buster:v4.2 --volume=/global/cfs/cdirs/m4386/opt-buster:/usr/opt;{input_path}:/input;{output_path}:/output;/global/cscratch1/sd/chester/tmpfiles:/tmp:perNodeCache=size=1000G --module=none --env-file=/global/homes/c/chester/shifter.env /global/homes/c/chester/globus_flows/run_compute_analyze.sh {run} {nsegs}".split(),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
-        process.check_returncode() # throws if non-zero
-    
-        return process.returncode  # return 0 (success)
+        
+        return (
+            p.returncode, p.stdout.decode("UTF-8"), p.stderr.decode("UTF-8")
+        ) 
 
     # Configure the job:
 
@@ -104,13 +95,17 @@ def analyze(endpoint_id, ncpus, input_path, output_path):
     
     with Executor(endpoint_id=endpoint_id) as gce:
         future = gce.submit(
-            callback, ncpus, input_path, output_path, run, segments
+            callback, input_path, output_path, run, segments
         )
         # Must handle results inside the `with` statement before implicit
         # invocation of `.shutdown()`.
         result = future.result()
+
+    if result[0] != 0:
+        raise RuntimeError(f"ERROR: {result}")
             
     return result
+
 
 def register_function():
     """Register the fitting function and return its UUID.

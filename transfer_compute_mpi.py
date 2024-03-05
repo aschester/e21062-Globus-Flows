@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 ##
-# @file:  transfer_compute_dirwatch.py
+# @file:  transfer_compute_mpi.py
 # @brief: Run a flow to transfer data to NERSC and perform compute tasks on
 #         Perlmutter before transferring analyzed results to FRIB. The flow
 #         can be triggered using python watchdog or run manually by specifying
@@ -56,27 +56,22 @@ def run_flow(event_file=None):
     # Get the run directory from the trigger file path or argument:
     
     if args.watchdir:
-        base_dir = event_file
+        base_dir       = event_file
         pipeline_input = base_dir.replace("/cephfs", "")
     else:
-        base_dir = args.rundir.rstrip("/")
+        base_dir       = args.rundir.rstrip("/")
         pipeline_input = args.rundir.replace("/cephfs", "")
         
     run_dir = os.path.basename(base_dir)
     run_num = int(run_dir[3:])
         
-    # Translate local input path to Globus path:
+    # Top level paths (on Globus):
 
-    # Top level paths (on Globus). These are mounted under the shifter image
-    # on the NERSC endpoint at /rawdata, /fitted, /converted, /analyzed.
-    # Volume mounts are defined in the compute endpoint config file as
-    # scheduler option:
-
-    transfer_toplevel  = "/global/cfs/cdirs/m4386/e21062_flows/rawdata"
-    fit_toplevel       = "/global/cfs/cdirs/m4386/e21062_flows/fitted"
-    converted_toplevel = "/global/cfs/cdirs/m4386/e21062_flows/converted"
-    analyzed_toplevel = "/global/cfs/cdirs/m4386/e21062_flows/analyzed"
-    analyzed_output_fname = f"run-{run_dir[3:]}-sorted.root"
+    transfer_toplevel     = "/global/cfs/cdirs/m4386/e21062_flows/rawdata"
+    fit_toplevel          = "/global/cfs/cdirs/m4386/e21062_flows/fitted"
+    converted_toplevel    = "/global/cfs/cdirs/m4386/e21062_flows/converted"
+    analyzed_toplevel     = "/global/cfs/cdirs/m4386/e21062_flows/analyzed"
+    analyzed_output_fname = f"run-{run_num}-sorted.root"
 
     # Configure paths for pipeline steps:
 
@@ -103,26 +98,34 @@ def run_flow(event_file=None):
     # Setup compute endpoints and functions #
     #########################################
 
-    # Multi-threaded fitting on the multi-node endpoint:
-    compute_fit_ep_id = "c1f86365-432f-47dc-92c3-6d909e3f128d"
-    fit_function_id   = "c33bd4db-71cc-4852-96e1-7497f38658a4"
+    # Compute endpoints at NERSC for FRIB analysis:
     
-    # The conversion/analysis is done on the single-node endpoint:
-    compute_analysis_ep_id = "4dc55319-c672-42ac-b387-2e8dc6b3571a"
-    convert_function_id    = "2c68f1c5-b878-4704-a294-0f9274076541"
-    analysis_function_id   = "d6415d90-9e30-46a1-80d9-7d65a48e0cb1"
+    compute_fit_ep_id      = "ff16dcd1-0632-4fdd-8b0c-d239d4f1b889"
+    compute_convert_ep_id  = "f4d90d3e-ed80-4aae-b0de-62fdbe2a0739"
+    compute_analysis_ep_id = "5080ade8-846b-4964-88a1-2c602d5d38f4"
+
+    # Function UUIDs for remote execution on the above endpoints:
+    
+    fit_function_id      = "42e3e64f-4d1e-4681-9a3e-cc9533d7933e"    
+    convert_function_id  = "2be66611-af61-4a9e-a0b2-3407675771c7"
+    analysis_function_id = "62f120cd-9249-4124-b9df-44f8e1c44fe1"
     
     # Check the endpoint status:
-
+    
     if not endpoint_online(compute_fit_ep_id):
         raise RuntimeError(
             f"Trace-fitting compute endpoint {compute_fit_ep_id} "
-             "is not online!"
+            "is not online!"
+        )
+    if not endpoint_online(compute_convert_ep_id):
+        raise RuntimeError(
+            f"ROOT conversion compute endpoint {compute_convert_ep_id} "
+            "is not online!"
         )
     if not endpoint_online(compute_analysis_ep_id):
         raise RuntimeError(
-            f"ROOT conversion and analysis compute endpoint "
-            "{compute_analysis_ep_id} is not online!"
+            f"Analysis compute endpoint {compute_analysis_ep_id} "
+            "is not online!"
         )
 
     ##################
@@ -133,7 +136,7 @@ def run_flow(event_file=None):
     fc = create_flows_client(
         flow_id=flow_id, collection_ids=[frib_dtn_id, nersc_dtn_id]
     )
-    flow_label = f"FRIB-NERSC Analysis Pipline Run {run_num}"
+    flow_label = f"FRIB-NERSC Analysis Pipeline Run {run_num}"
 
     # Flow input schema:
 
@@ -196,7 +199,6 @@ def run_flow(event_file=None):
             "function": fit_function_id,
             "kwargs": {
                 "endpoint_id": compute_fit_ep_id,
-                "ncpus": 128,
                 "input_path": transfer_path,
                 "output_path": fit_path
             },
@@ -206,11 +208,10 @@ def run_flow(event_file=None):
             "path": converted_path
         },
         "convert": {
-            "endpoint": compute_analysis_ep_id,
+            "endpoint": compute_convert_ep_id,
             "function": convert_function_id,
             "kwargs": {
-                "endpoint_id": compute_analysis_ep_id,
-                "ncpus": 1,
+                "endpoint_id": compute_convert_ep_id,
                 "input_path": fit_path,
                 "output_path": converted_path
             },
@@ -220,7 +221,6 @@ def run_flow(event_file=None):
             "function": analysis_function_id,
             "kwargs": {
                 "endpoint_id": compute_analysis_ep_id,
-                "ncpus": 1,
                 "input_path": converted_path,
                 "output_path": analyzed_toplevel
             },
@@ -277,6 +277,7 @@ def endpoint_online(endpoint_id):
     -------
     bool
         True if the endpoint is online, False otherwise.
+
     """
     gcc = Client()
     name = gcc.get_endpoint_metadata(endpoint_id)["name"]
@@ -290,29 +291,6 @@ def endpoint_online(endpoint_id):
     
     return True
 
-
-def latest_mod_time(path):
-    """Find the newest file modification time in the provided path.
-
-    Parameters
-    ----------
-    path : str
-        Directory path containing files to check.
-    
-    Returns
-    -------
-    float
-        The latest file modification time in seconds.
-
-    """
-    files = [entry.path for entry in os.scandir(path) if entry.is_file()]
-    # Sometimes between the list construction and mtime check a temporary
-    # file from rsync is renamed and no longer exists. Make sure the file
-    # exists before getting the modification times or sometimes crash out:
-    mod_times = [os.path.getmtime(f) for f in files if os.path.exists(f)]
-    
-    return min([time.time() - t for t in mod_times])
-    
 
 def parse_args():
     """Parse arguments and return an argparse.Namespace.
