@@ -1,0 +1,5 @@
+# Automated Data Analysis Using Globus Flows
+This repository contains an automated workflow example for FRIB data analysis used during FDSi experiment e21062B (PI: H. Crawford) which ran 27 Feb. - 4 Mar. 2024. The analysis utilizes the computational resources available at NERSC to increase the throughput for compute-intensive tasks such as fitting ADC trace data. High-speed data transfer between FRIB and NERSC is done over ESnet, and the entire workflow--data transfer and analysis--is managed using a Globus Flow.
+
+A Globus Flow is composed of a series of _action providers_, which perform _actions_ as part of a _flow_. The service to run a file transfer between Globus collections is an example of an action provider. The associated action contains the results, status, and metadata associated with a particular invocation of the transfer action provider. A flow incorporates (possibly many) action providers in a defined order: for example, copying data from a source colletion to a destination colleciton via some intermediary collection. Starting a flow with a particular set of inputs is called a _run_ or _flow run_.
+
