@@ -1,4 +1,11 @@
 # Automated Data Analysis Using Globus Flows
+A. Chester
+Facility for Rare Isotope Beams
+640 S. Shaw Ln.
+East Lansing, MI 48924 USA
+
+5 March 2024
+
 ## Introduction
 This repository contains an automated workflow example for FRIB data analysis used during FDSi experiment e21062B (PI: H. Crawford) which ran 27 Feb. to 4 Mar. 2024. The workflow utilizes the computational resources available at NERSC to increase the throughput for compute-intensive tasks such as fitting ADC trace data. High-speed data transfer between FRIB and NERSC is done over ESnet, and the entire workflow--data transfer and analysis--is managed using a Globus Flow. Some familiarity with Globus, HPC computing (specifically at NERSC), and the e21062 analysis methods are assumed, though the overall framework is general enough to apply to other use cases.
 
