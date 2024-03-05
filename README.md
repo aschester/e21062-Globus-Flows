@@ -31,7 +31,7 @@ Globus Compute provides a "Function-as-a-Service" (FaaS) platform, allowing user
 - [Parsl](https://parsl.readthedocs.io/en/stable/#)
 - [Slurm](https://slurm.schedmd.com/)
 
-# e21062 Example Flow
+## e21062 Example Flow
 The author assumes the user has:
 1. An account at NERSC which is part of the e21062 analysis project m4386.
 2. Familiarity with the [FRIBDAQ parallel trace fitting software](https://github.com/FRIBDAQ/DDASToys).
@@ -43,7 +43,7 @@ The `transfer_compute` flow contained in this repository uses a combination of t
 
 ![e21062 Example Flow](images/e21062_flow.png)
 
-## Installation
+### Installing, Configuring, and Running the e21062 Example Flow
 - Clone the repository `git clone https://github.com/aschester/flows_e21062.git` somewhere which can mount the Ceph filesystem visible to the FRIB DTN.
 - Copy the `globus_flows` directory to NERSC. This directory contains the jobs scripts which are remotely executed by the compute functions in this repository as well as endpoint monitoring tools.
 - Open `transfer_compute_mpi.py` and ensure that the collection, endpoint, compute function, and flow UUIDs, and top-level paths are correct. Update the UUIDs and paths as necessary. See the section on [script usage](#script-usage) for details. The flow will check whether the directory structure defined in `transfer_compute_mpi.py` exists and create it if it does not.
@@ -52,4 +52,4 @@ The `transfer_compute` flow contained in this repository uses a combination of t
 - Run a flow. Note that this must be done from inside the Python virtual environment where the Globus SDK and Globus Compute SDK are installed. The `venvcmd` script provides a shortcut: `./venvcmd ./transfer_compute_mpi.py --rundir /path/to/toplevel/directory/rundir`. You can monitor the status of the flow on the [Globus Web App](https://app.globus.org/runs).
 - (Optional) Configure the flow to run automatically. Rather than starting a flow run by hand, it is possible to run the flow in a mode where it will monitor a filesystem on the DTN for new run directories and trigger flows automatically once one is discovered. To watch a directory for events and automatically trigger the flow, run the script as `./venvcmd ./transfer_compute_mpi.py --watchdir /path/to/toplevel/directory`. It may be helpful to background this process and log the output: `nohup ./venvcmd ./transfer_compute_mpi.py --watchdir /path/to/toplevel/directory >> watcher.log 2>&1 &`.
 
-## Script Usage
+### Script Usage
