@@ -44,6 +44,6 @@ The `transfer_compute` flow contained in this repository uses a combination of t
 
 ## Installation
 - Clone the repository `git clone https://github.com/aschester/flows_e21062.git` somewhere which can mount the Ceph filesystem visible to the FRIB DTN.
-- Open `transfer_compute_mpi.py` and ensure that the endpoint UUIDs, function UUIDs, top-level paths and flow UUID are correct. See the section on [script usage](#script-usage) for details.
+- Open `transfer_compute_mpi.py` and ensure that the endpoint UUIDs, function UUIDs, top-level paths and flow UUID are correct. See the section on [script usage](#introduction) for details.
 
 ## Script Usage
