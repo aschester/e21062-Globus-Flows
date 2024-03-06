@@ -47,40 +47,40 @@ This section details the various scripts in this directory and how they are used
 
 #### Endpoint Creation and Monitoring
 The following scripts in globus_flows/ep_launch/ can be used to setup the compute endpoints, monitor their status, and restart them if necessary. They are intended to be run on the host system of the compute endpoint. The compute endpoints use Parsl's `SlurmProvider` to submit jobs using `sbatch`. The globus_flows/ep_launch/ folder also contains three config-*.yaml files which provide some default configuration for each of the compute endpoints.
-- **create.sh**  Create and start compute endpoints named frib-fit-mpi, frib-convert and frib-analysis with the default configurations.
-- **delete.py**  Delete all managed compute endpoints. For now, all of the endpoints exist at NERSC. This script makes no effort to determine whether that is always the case and will delete all of the user's managed endpoints.
-- **monitor.py**  Monitor the endpoint status and restart any endpoints that are offline. Intended to be run as part of a `scrontab` job.
-- **gce**  Wrapper to simplify calls to `globus-compute-endpoint` for endpoints created by create.sh. Example usage: `./gce restart` will restart all of frib-fit-mpi, frib-convert and frib-analysis.
+- **create.sh** Create and start compute endpoints named frib-fit-mpi, frib-convert and frib-analysis with the default configurations.
+- **delete.py** Delete all managed compute endpoints. For now, all of the endpoints exist at NERSC. This script makes no effort to determine whether that is always the case and will delete all of the user's managed endpoints.
+- **monitor.py** Monitor the endpoint status and restart any endpoints that are offline. Intended to be run as part of a `scrontab` job.
+- **gce** Wrapper to simplify calls to `globus-compute-endpoint` for endpoints created by create.sh. Example usage: `./gce restart` will restart all of frib-fit-mpi, frib-convert and frib-analysis.
 
 #### Compute Functions
 Compute functions support remote execution of FRIBDAQ and user executables under a supported RTE on the NERSC Perlmutter supercomputer. These jobs are run via `sbatch` because the compute endpoints use the Parsl `SlurmProvider`.
-- fit_mpi.py: Run batch MPI fitting jobs. Batch submission requires a callback function UUID. To update the callback, run `./venvcmd ./fit_mpi.py --register-callback`. The `function_id` variable within `fit_mpi` must be set using the returned UUID. To re-register the fit function, run `./venvcmd ./fit_mpi.py --register-batch`.
-- convert.py: Run batch ROOT-conversion jobs. Batch submission requires a callback function UUID. To update the callback, run `./venvcmd ./convert.py --register-callback`. The `function_id` variable within `convert` must be set using the returned UUID. To re-register the conversion function, run `./venvcmd ./convert.py --register-batch`.
-- analyze.py: Run the Liddick group user analysis `betasort` function. This function is called one time per run and uses the `Executor` class to submit the function to Globus. To re-register the function, run `./venvcmd ./analyze.py --register`.
+- **fit_mpi.py** Run batch MPI fitting jobs. Batch submission requires a callback function UUID. To update the callback, run `./venvcmd ./fit_mpi.py --register-callback`. The `function_id` variable within `fit_mpi` must be set using the returned UUID. To re-register the fit function, run `./venvcmd ./fit_mpi.py --register-batch`.
+- **convert.py** Run batch ROOT-conversion jobs. Batch submission requires a callback function UUID. To update the callback, run `./venvcmd ./convert.py --register-callback`. The `function_id` variable within `convert` must be set using the returned UUID. To re-register the conversion function, run `./venvcmd ./convert.py --register-batch`.
+- **analyze.py** Run the Liddick group user analysis `betasort` function. This function is called one time per run and uses the `Executor` class to submit the function to Globus. To re-register the function, run `./venvcmd ./analyze.py --register`.
 
 #### Slurm Job Scripts
 Scripts in globus_flows/ for remote execution using Globus Compute. These scripts should be installed on the compute host system and are submitted using `sbatch` to the resources allocated by the compute endpoint, see [Endpoint Creation and Monitoring](#endpoint-creation-and-monitoring). The job scripts expect that their input and output directories are mounted to /input and /output in the container image they are run under. Job scripts should write their own logs, as capturing stdout and stderr from Slurm through Parsl is difficult.
-- run_compute_fit_mpi.sh: Fit ADC traces and modify the event data using the FRIBDAQ `EventEditor` framework and MPI parallelization. Note that this function uses the version of MPI installed in the FRIBDAQ /usr/opt tree and calls that version's `mpirun` explicitly. 
-- run_compute_convert.sh: Convert fitted FRIBDAQ event files to ROOT format using the DDASToys `EEConverter`.
-- run_compute_analyze.sh: Perform user analysis. Calls the Liddick group `betasort` executable.
+- **run_compute_fit_mpi.sh** Fit ADC traces and modify the event data using the FRIBDAQ `EventEditor` framework and MPI parallelization. Note that this function uses the version of MPI installed in the FRIBDAQ /usr/opt tree and calls that version's `mpirun` explicitly. 
+- **run_compute_convert.sh** Convert fitted FRIBDAQ event files to ROOT format using the DDASToys `EEConverter`.
+- **run_compute_analyze.sh** Perform user analysis. Calls the Liddick group `betasort` executable.
 
 #### Deploy or Update a Flow
 Deploy a new flow or update an existing flow. Flow definitions and input schema are found in the transfer/ and transfer_compute/ directories. 
-- deploy_flow.py: Deploy or update a flow. Run the script with the `-h` argument to see the options. To update an existing flow, specify its UUID using the `--flowid` argument. 
+- **deploy_flow.py** Deploy or update a flow. Run the script with the `-h` argument to see the options. To update an existing flow, specify its UUID using the `--flowid` argument. 
 
 #### Run a Flow
 Scripts which are used to run flows and set a directory-watch trigger for flow automation.
-- transfer_compute_mpi.py: Run the analysis flow to transfer data and perform computing tasks remotely at NERSC. Run the script with the `-h` argument to see the options. To start a single flow run by hand, use the `--rundir` option; to start a triggered flow, use the `--watchdir` option. The `--dry-run` option will run the script without running the flow itself. Note that this *does not* validate the input schema, as the `SpecificFlowsClient` does not implement a `dry_run` option like some other Flows clients! The flow definition and input schema are found in transfer_compute/. The flow run by this script is registered under the name FRIB-NERSC-Analysis-Pipeline with UUID babd88e5-d31d-48c7-b3a0-b765389b5c22.
-- transfer_resorted.py: Run a flow to transfer data from NERSC to the FRIB DTN. Run the script with the `-h` argument to see the options. Most likely you will only want to override the default paths. The flow definition and input schema are found in transfer/. The flow run by this script is registered under the name FRIB-Transfer with UUID 47557a0b-75ba-4df1-8a85-f5fb556c31a4.
-- flows_service.py: Utility functions for interacting with the Globus Flows service, based on flows_service.py found [here](https://github.com/globus/globus-flows-trigger-examples). Utility functions for fetching tokens and authorization as well as creating a Flows Client are provided.
-- dirwatch.py: A directory-watching trigger class for automation of the FRIB-NERSC-Analysis-Pipeline flow. Intended to monitor a directory on the FRIB DTN where pipeline input data is copied using the `rsync` command. This is the trigger class used by the FRIB-NERSC-Analysis-Pipeline flow.
+- **transfer_compute_mpi.py** Run the analysis flow to transfer data and perform computing tasks remotely at NERSC. Run the script with the `-h` argument to see the options. To start a single flow run by hand, use the `--rundir` option; to start a triggered flow, use the `--watchdir` option. The `--dry-run` option will run the script without running the flow itself. Note that this *does not* validate the input schema, as the `SpecificFlowsClient` does not implement a `dry_run` option like some other Flows clients! The flow definition and input schema are found in transfer_compute/. The flow run by this script is registered under the name FRIB-NERSC-Analysis-Pipeline with UUID babd88e5-d31d-48c7-b3a0-b765389b5c22.
+- **transfer_resorted.py** Run a flow to transfer data from NERSC to the FRIB DTN. Run the script with the `-h` argument to see the options. Most likely you will only want to override the default paths. The flow definition and input schema are found in transfer/. The flow run by this script is registered under the name FRIB-Transfer with UUID 47557a0b-75ba-4df1-8a85-f5fb556c31a4.
+- **flows_service.py** Utility functions for interacting with the Globus Flows service, based on flows_service.py found [here](https://github.com/globus/globus-flows-trigger-examples). Utility functions for fetching tokens and authorization as well as creating a Flows Client are provided.
+- **dirwatch.py** A directory-watching trigger class for automation of the FRIB-NERSC-Analysis-Pipeline flow. Intended to monitor a directory on the FRIB DTN where pipeline input data is copied using the `rsync` command. This is the trigger class used by the FRIB-NERSC-Analysis-Pipeline flow.
 
 #### Testing
 Scripts for testing and development on Perlmutter.
-- run_compute_fit_mpi.sl: Job submission script for calling run_compute_fit_mpi.sh by hand using `sbatch`. Required arguments are the the run number and segment number e.g. `sbatch run_compute_fit_mpi.sl 1217 0`.
-- run_compute_convert.sl: Job submission script for calling run_compute_convert.sh by hand using `sbatch`. Required arguments are the the run number and segment number e.g. `sbatch run_compute_convert.sl 1217 0`.
-- run_compute_analyze.sl: Job submission script for calling run_compute_analyze.sh by hand using `sbatch`. Required arguments are the the run number and number of run segments e.g. `sbatch run_compute_analyze.sl 1217 1`. If the number of segments is 0, only the first run segment will be sorted; this is equivalent to specifying the number of segments equal to 1.
-- test_fit_mpi.py: A callable test compute function to test parallel fitting using MPI. Must be called from within the proper Python environment. This function is intended for testing and debugging only and is not a registered function which can be called as part of a flow.
+- **run_compute_fit_mpi.sl** Job submission script for calling run_compute_fit_mpi.sh by hand using `sbatch`. Required arguments are the the run number and segment number e.g. `sbatch run_compute_fit_mpi.sl 1217 0`.
+- **run_compute_convert.sl** Job submission script for calling run_compute_convert.sh by hand using `sbatch`. Required arguments are the the run number and segment number e.g. `sbatch run_compute_convert.sl 1217 0`.
+- **run_compute_analyze.sl** Job submission script for calling run_compute_analyze.sh by hand using `sbatch`. Required arguments are the the run number and number of run segments e.g. `sbatch run_compute_analyze.sl 1217 1`. If the number of segments is 0, only the first run segment will be sorted; this is equivalent to specifying the number of segments equal to 1.
+- **test_fit_mpi.py** A callable test compute function to test parallel fitting using MPI. Must be called from within the proper Python environment. This function is intended for testing and debugging only and is not a registered function which can be called as part of a flow.
 
 ## Resources
 - [NERSC docs](https://docs.nersc.gov/)
