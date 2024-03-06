@@ -21,23 +21,13 @@ The input to a flow is known as an _input document_. Many (if not all) couture f
 ### Globus Compute
 Globus Compute provides a "Function-as-a-Service" (FaaS) platform, allowing user's to execute their code using a remote _compute endpoint_. The endpoint is run by the user and provides an interface which allows for remote function execution on some host system. Resource requirements and scaling are defined as part of the endpoint configuration. Remote execution of a function is performed by either calling the `.submit()` method of the Globus Compute `Executor` class or using the Globus Compute `Client` batching. Pre-registered functions can be invoked using both of these methods. Parsl is used by the Globus Compute platform to manage resources specified by the endpoint configuration. At NERSC, Parsl must interact with the Slurm scheduler to submit tasks to allocated resources.
 
-### Documentation/Further Reading
-- [NERSC](https://docs.nersc.gov/)
-- [Globus Flows](https://docs.globus.org/api/flows/)
-- [Globus SDK](https://globus-sdk-python.readthedocs.io/en/stable/installation.html)
-- [Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)
-- [JSON schema format](https://json-schema.org/learn/getting-started-step-by-step)
-- [Globus Compute](https://funcx.readthedocs.io/en/latest/endpoints.html)
-- [Parsl](https://parsl.readthedocs.io/en/stable/#)
-- [Slurm](https://slurm.schedmd.com/)
-
 ## e21062 Example Flow
 The author assumes the user has:
 1. An account at NERSC which is part of the e21062 analysis project m4386.
 2. Familiarity with the [FRIBDAQ parallel trace fitting software](https://github.com/FRIBDAQ/DDASToys).
 3. A working knowledge on how to run jobs at NERSC.
-4. Installed the Globus SDK and Globus Compute SDK following the instructions on their respective documentation pages. Both SDKs require Python 3.10 or later; if your OS or containerized RTE does not support Python 3.10, you may need to run under one of the official Docker Python images (or e.g. an Apptainer image built from one of the Docker images) found [here](https://hub.docker.com/_/python).
-5. Some writable directory on the FRIB DTN for the pipeline output.
+4. Installed the Globus SDK and Globus Compute SDK following the instructions on their respective documentation pages of by running `pip install -r requirements.txt` from inside the a Python virtual environment. Both SDKs require Python 3.10 or later; if your OS or containerized RTE does not support Python 3.10, you may need to run under one of the official Docker Python images (or e.g. an Apptainer image built from one of the Docker images) found [here](https://hub.docker.com/_/python).
+5. The permissions to write pipeline output on the FRIB DTN.
 
 The `transfer_compute` flow contained in this repository uses a combination of transfer and compute action providers to copy FRIB data to NERSC, perform user analysis on the Perlmutter supercomputer, and copy the results back to FRIB. This is done through the FRIB DTN which can communicate with the Globus cloud. A schematic of the data analysis pipeline is shown below, with the steps run using Globus Flows shown inside the blue cloud.
 
@@ -53,3 +43,14 @@ The `transfer_compute` flow contained in this repository uses a combination of t
 - (Optional) Configure the flow to run automatically. Rather than starting a flow run by hand, it is possible to run the flow in a mode where it will monitor a filesystem on the DTN for new run directories and trigger flows automatically once one is discovered. To watch a directory for events and automatically trigger the flow, run the script as `./venvcmd ./transfer_compute_mpi.py --watchdir /path/to/toplevel/directory`. It may be helpful to background this process and log the output: `nohup ./venvcmd ./transfer_compute_mpi.py --watchdir /path/to/toplevel/directory >> watcher.log 2>&1 &`.
 
 ### Script Usage
+
+## Documentation/Further Reading
+- [NERSC](https://docs.nersc.gov/)
+- [Globus Flows](https://docs.globus.org/api/flows/)
+- [Globus SDK](https://globus-sdk-python.readthedocs.io/en/stable/installation.html)
+- [Amazon States Language](https://docs.aws.amazon.com/step-functions/latest/dg/concepts-amazon-states-language.html)
+- [JSON schema format](https://json-schema.org/learn/getting-started-step-by-step)
+- [Globus Compute](https://funcx.readthedocs.io/en/latest/endpoints.html)
+- [Parsl](https://parsl.readthedocs.io/en/stable/#)
+- [Slurm](https://slurm.schedmd.com/)
+- The Globus Flows scripts are derived in whole or in part from the [globus-flows-trigger-examples](https://github.com/globus/globus-flows-trigger-examples) repository and are redistributed under the Apache-2.0 license.

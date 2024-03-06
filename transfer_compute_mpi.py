@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 ##
-# @file:  transfer_compute_mpi.py
+# @file: transfer_compute_mpi.py
 # @brief: Run a flow to transfer data to NERSC and perform compute tasks on
-#         Perlmutter before transferring analyzed results to FRIB. The flow
-#         can be triggered using python watchdog or run manually by specifying
-#         an input directory.
+# Perlmutter before transferring analyzed results to FRIB. The flow can be
+# triggered using the dirwatch DirectoryTrigger or run manually by specifying
+# an input directory.
 #
 
 import os
@@ -14,7 +14,7 @@ import argparse
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    format="%(levelname)s - %(asctime)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 import time
@@ -264,7 +264,8 @@ def run_flow(event_file=None):
             run_monitors=[admins],
             tags=["Transfer", "Compute", "FRIB"],
         )
-    
+
+        
 def endpoint_online(endpoint_id):
     """Check the endpoint status and return True if it is online.
 
@@ -317,7 +318,8 @@ def parse_args():
         nargs="?",
         default=30,
         help="Delay applied to the flow start in seconds to ensure all "
-        "data is copied in [default=30]."
+        "data is copied in [default=30]. If --rundir is specified, this "
+        "parameter is ignored."
     ) 
     
     mutex_group = input_group.add_mutually_exclusive_group(required=True)
@@ -353,8 +355,7 @@ if __name__ == "__main__":
     """
     args = parse_args()
 
-    # Configure the trigger for starting the pipeline and run it:
-    
+    # Configure the trigger for starting the pipeline and run it:    
     try:
         if args.watchdir:
             trigger = DirectoryTrigger(
