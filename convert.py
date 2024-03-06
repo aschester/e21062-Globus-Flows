@@ -82,6 +82,7 @@ def convert(endpoint_id, input_path, output_path):
     import os
     import fnmatch
     import time
+    
     from globus_compute_sdk import Client
 
     # Configure the job:
