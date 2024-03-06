@@ -9,7 +9,7 @@ import argparse
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    format="%(levelname)s - %(asctime)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
@@ -75,7 +75,6 @@ def fit_mpi(endpoint_id, input_path, output_path):
     import os
     import fnmatch
     import time
-    from globus_compute_sdk import Executor
     from globus_compute_sdk import Client
     import concurrent.futures
     

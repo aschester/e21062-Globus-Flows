@@ -3,12 +3,14 @@
 ##
 # @file:  deploy_flow.py
 # @brief: Deploy a new flow or update an existing one.
+# See https://github.com/globus/globus-flows-trigger-examples.
 #
 
 import argparse
 import json
 
 from flows_service import create_flows_client
+
 
 def deploy_flow():
     """Deploy or update a flow.
@@ -84,7 +86,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    """The main: Deploy the flow.
+    """The main: Deploy or update the flow.
 
     """
     flow_id, scope = deploy_flow()

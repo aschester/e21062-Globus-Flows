@@ -1,9 +1,10 @@
 ##
 # @file:  dirwatch.py
 # @brief: Class for monitoring the DTN rawdata directory to automatically
-#         trigger Globus flow runs. Avoids using the Python watchdog class
-#         and its dependence on Linux inotify which works only for local
-#         filesystem events.
+# trigger Globus flow runs. Avoids using the Python watchdog class and its
+# dependence on Linux inotify which works only for local filesystem events,
+# though similar in structure to the watch.py script found here:
+# https://github.com/globus/globus-flows-trigger-examples.
 #
 
 import os
@@ -12,10 +13,11 @@ import time
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    format="%(levelname)s - %(asctime)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 import threading
+
 
 class DirectoryTrigger:
     """Trigger-handling class which monitors a rawdata directory for the 
@@ -63,7 +65,12 @@ class DirectoryTrigger:
 
         
     def run(self):
-        """Monitor the watchdir and wait for events.
+        """Monitor the watchdir and wait for events. New directories are found 
+        using the XOR of previously seen and current directory lists. When a 
+        new directory is found, a daemon thread is created to launch the flow. 
+        The thread waits for all the data to be copied into the directory by 
+        monitoring the modification times of the directory and its contents.
+        Directory status is checked every 5 minutes (300 seconds) by default.
 
         """        
         logging.root.info("Watcher Started\n")
@@ -85,20 +92,20 @@ class DirectoryTrigger:
         seen = {d for d in os.listdir(self.watch_dir) if d.startswith("run")}
         
         # Look for new directories and start a flow run when a new directory
-        # has copied in all its data.
+        # has copied in all its data:
         try:
             while True:
                 current = {
                     d for d in os.listdir(self.watch_dir) if d.startswith("run")
                 }
-                new = seen ^ current
+                new = seen ^ current # XOR
                 logging.root.debug(f"seen {seen} current {current} new {new}")
                 {threading.Thread(target=self.flow_thread,
                                   args=(os.path.join(self.watch_dir, n),),
                                   daemon=True).start() for n in new
                  } if new else None
                 seen = current
-                time.sleep(300)
+                time.sleep(300) # Check interval.
         except Exception as e:
             logging.root.error(f"ERROR: {e}")
         except:
@@ -131,7 +138,8 @@ class DirectoryTrigger:
 
     def get_last_mtime(self, path):
         """Get the latest modification time for the directory specified by the 
-        path and and all files contained within it.
+        path and and all files contained within it. This assumes that data is 
+        copied onto the DTN using rsync.
 
         Parameters
         ----------
@@ -145,20 +153,21 @@ class DirectoryTrigger:
 
         """
         # The sych'd files are renamed, which may happen as we try to get
-        # their mtime:
+        # their mtime, resulting in a FileNotFoundErrror. Catch it, log a
+        # warning and move on:
         fmtimes = []
         for f in os.scandir(path):
             if f.is_file():
                 try:
                     mtime = os.path.getmtime(f)
                 except FileNotFoundError as e:
-                    print(
+                    logging.root.warning(
                         f"{f} does not exist! If it is a hidden file, "
                         "ignore this warning as it likely has been renamed"
                     )
                 else:
                     fmtimes.append(mtime)
-        # One of these is the latest mod time:
+        # The smallest of these is the latest mod time:
         fmtime = min([time.time() - t for t in fmtimes]) if fmtimes else 0
         dmtime = time.time() - os.path.getmtime(path)
 

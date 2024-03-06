@@ -1,6 +1,7 @@
 ##
 # @file:  flows_service.py
 # @brief: Utility functions for interacting with the Globus Flows service.
+# See: https://github.com/globus/globus-flows-trigger-examples
 #
 
 import os
@@ -47,6 +48,7 @@ def get_tokens(scopes=None):
     ------
     globus_sdk.OAuthTokenResponse
         Responses for OAuth2 code for token exchange.
+
     """
     # Initiate login flow
     CLIENT.oauth2_start_flow(
@@ -77,6 +79,7 @@ def get_authorizer(flow_id=None, collection_ids=None):
     -------
     globus_sdk.RefreshTokenAuthorizer
         The authorizer using a Refresh Token to fetch Access Tokens.
+
     """
     if flow_id:
         scopes = globus_sdk.SpecificFlowClient(flow_id).scopes
@@ -141,6 +144,7 @@ def create_flows_client(flow_id=None, collection_ids=None):
     -------
     FlowsClient
         The Flows client.
+
     """
     authorizer = get_authorizer(flow_id, collection_ids=collection_ids)    
     if flow_id:

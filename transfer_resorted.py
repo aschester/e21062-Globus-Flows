@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
 ##
-# @file:  transfer_compute_dirwatch.py
-# @brief: Run a flow to transfer data to NERSC and perform compute tasks on
-#         Perlmutter before transferring analyzed results to FRIB. The flow
-#         can be triggered using python watchdog or run manually by specifying
-#         an input directory.
+# @file: transfer_resorted.py
+# @brief: Run a flow to transfer data from NERSC to the FRIB DTN.
 #
 
 import os
@@ -14,7 +11,7 @@ import argparse
 import logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(message)s",
+    format="%(levelname)s - %(asctime)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 import time
