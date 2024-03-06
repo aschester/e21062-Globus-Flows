@@ -47,10 +47,10 @@ This section details the various scripts in this directory and how they are used
 
 #### Endpoint Creation and Monitoring
 The following scripts in globus_flows/ep_launch/ can be used to setup the compute endpoints, monitor their status, and restart them if necessary. They are intended to be run on the host system of the compute endpoint. The compute endpoints use Parsl's `SlurmProvider` to submit jobs using `sbatch`. The globus_flows/ep_launch/ folder also contains three config-*.yaml files which provide some default configuration for each of the compute endpoints.
-- **create.sh** Create and start compute endpoints named frib-fit-mpi, frib-convert and frib-analysis with the default configurations.
-- **delete.py** Delete all managed compute endpoints. For now, all of the endpoints exist at NERSC. This script makes no effort to determine whether that is always the case and will delete all of the user's managed endpoints.
-- **monitor.py** Monitor the endpoint status and restart any endpoints that are offline. Intended to be run as part of a `scrontab` job.
-- **gce** Wrapper to simplify calls to `globus-compute-endpoint` for endpoints created by create.sh. Example usage: `./gce restart` will restart all of frib-fit-mpi, frib-convert and frib-analysis.
+- **create.sh**  Create and start compute endpoints named frib-fit-mpi, frib-convert and frib-analysis with the default configurations.
+- **delete.py**  Delete all managed compute endpoints. For now, all of the endpoints exist at NERSC. This script makes no effort to determine whether that is always the case and will delete all of the user's managed endpoints.
+- **monitor.py**  Monitor the endpoint status and restart any endpoints that are offline. Intended to be run as part of a `scrontab` job.
+- **gce**  Wrapper to simplify calls to `globus-compute-endpoint` for endpoints created by create.sh. Example usage: `./gce restart` will restart all of frib-fit-mpi, frib-convert and frib-analysis.
 
 #### Compute Functions
 Compute functions support remote execution of FRIBDAQ and user executables under a supported RTE on the NERSC Perlmutter supercomputer. These jobs are run via `sbatch` because the compute endpoints use the Parsl `SlurmProvider`.
