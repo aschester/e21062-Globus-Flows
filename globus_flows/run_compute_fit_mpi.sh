@@ -31,7 +31,6 @@ tmpout=/tmp/tmpout-$SLURM_JOB_ID-run-$run-$seg.evt
 #tmpout=$PSCRATCH/tmpout-$SLURM_JOB_ID-run-$run-$seg.evt
 
 tasks=$SLURM_CPUS_PER_TASK
-#tasks=$SLURM_NTASKS
 nworkers=`expr $tasks - 3` # 3 reserved for fan-in, fan-out, sort (MPI only!)
 
 # Using SLURM stdout and stderr redirection does not work for compute, as the
@@ -57,7 +56,11 @@ echo "Copying input..." >> $logfile
 cp -v $input $tmpin >> $logfile 2>&1
 echo "... Done" >> $logfile
 
-# Run the fitter and write to our log:
+# Run the fitter and write to our log. mpirun's --use-hwthread-cpus and
+# --oversubscribe options are some chicanery which allows us to run multiple
+# Parsl-managed fitting tasks on a single node each using the number of 'CPUs'
+# specified by the SBATCH --cpus-per-task option. A little unexpected compared
+# to specifiying --ntasks-per-node but the resource usage looks OK, so:
 
 echo "Fitting traces with mpirun -np $tasks $DAQBIN/EventEditor..." >> $logfile
 mpirun --use-hwthread-cpus --oversubscribe -np $tasks \

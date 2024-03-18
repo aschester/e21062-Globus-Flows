@@ -39,7 +39,7 @@ cp -rv /input $tmpin >> $logfile 2>&1
 echo "... Done\n" >> $logfile
 
 # Build all segments into the TChain for analysis. The trailing slashes
-# on the dirs are necessary... sigh:
+# on the dirs are necessary... sigh...:
 /global/cfs/cdirs/m4386/e21062_flows/software/betasort/betasort \
     $tmpin/ $tmpout/ $run $nsegs >> $logfile 2>&1
 
