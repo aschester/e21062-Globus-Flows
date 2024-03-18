@@ -68,8 +68,9 @@ def fit_mpi(endpoint_id, input_path, output_path):
 
     Returns
     -------
-    tuple : int, str, str
-        (returncode, stdout, stderr). (0, "", "") if success.
+    dict
+        A dict of tuple objects returned from the callback function, keyed 
+        by task ID: (returncode, stdout, stderr). (0, "", "") if success.
     
     """
     import os

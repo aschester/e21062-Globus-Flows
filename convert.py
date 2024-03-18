@@ -75,8 +75,9 @@ def convert(endpoint_id, input_path, output_path):
 
     Returns
     -------
-    tuple : int, str, str
-        (returncode, stdout, stderr). (0, "", "") if success.
+    dict
+        A dict of tuple objects returned from the callback function, keyed 
+        by task ID: (returncode, stdout, stderr). (0, "", "") if success.
 
     """
     import os
@@ -111,7 +112,7 @@ def convert(endpoint_id, input_path, output_path):
         return True
             
     while not check_status(results):
-        time.sleep(30)
+        time.sleep(10)
         results = gcc.get_batch_result(batch_res["tasks"][function_id])
 
     if not results:
